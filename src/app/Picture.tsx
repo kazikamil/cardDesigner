@@ -16,6 +16,7 @@ export default function Picture(props:HeaderParam)
     let Bcolor=useSelector((state:any)=>state.sizePos.backC)
     let [Bco,setBco]=useState({r:255,g:0,b:0,a:1})
     let color=useSelector((state:any)=>state.text.color) 
+    let hidden=useSelector((state:any)=>state.api.hidden) 
     let [cl,setCl]=useState('black')
     let value=useSelector((state:any)=>state.api.value)
     let [valueC,setValue]=useState('')
@@ -334,10 +335,10 @@ export default function Picture(props:HeaderParam)
           <input id="fileInput" type="file" style={{display:'none'}} onChange={handleFileChange} />
           <p className={text==''?'hidden':''} style={{fontSize:size+'px',fontFamily:font,color:cl}}>{text}</p>
           <img className={ImageSrc==""? 'hidden':''} src={ImageSrc?(typeof ImageSrc==='string'?ImageSrc:''):''} style={{width:'100%',height:'100%',objectFit:'contain'}} />
-          <div width={cWidth} height={cHeight} x={cX} y={cY} title="barcode" className={valueC==""? 'hidden':''}>
+          <div width={cWidth} height={cHeight} x={cX} y={cY} title="barcode" className={(valueC==""||hidden)? 'hidden':''}>
             <Barcode value={valueC}/>
           </div>
-          <div height={cHeight} title="qrcode" x={cX} y={cY} className={cuQr==""? 'hidden':'w-full h-full'}>
+          <div height={cHeight} title="qrcode" x={cX} y={cY} className={(cuQr==""||hidden)? 'hidden':'w-full h-full'}>
              <QRCode className="w-full h-full" value={cuQr} />
           </div>
           <div ref={refLeft} className={"resizer resizer-l "+display}></div>

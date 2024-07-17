@@ -4,6 +4,8 @@ import Eurequat from "./img/Eurequat.png"
 import Image from "next/image";
 import { Xslt, XmlParser } from 'xslt-processor'
 import { toPng } from "html-to-image";
+import { useDispatch, UseDispatch } from "react-redux";
+import { changeHidden } from "./Store/features/api";
 var htmlString:any;
 var xsltString:string=`<?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
@@ -42,6 +44,7 @@ var xsltString:string=`<?xml version="1.0" encoding="UTF-8"?>
 const xslt = new Xslt();
 const xmlParser = new XmlParser();
 export default function Navbar(){
+    let dispatch = useDispatch()
     const getZpl=async()=>{
         htmlString=document.getElementById('recto')?.innerHTML
         let zpl=await xslt.xsltProcess(
@@ -68,7 +71,9 @@ export default function Navbar(){
     }
     const print = async () => {
         let zpl=await getZpl()
+        dispatch(changeHidden())
         let blob= await getBlob()
+        dispatch(changeHidden())
     }
     return(
       <nav className="h-12 bg-white shadow md:flex md:justify-between md:items-center">

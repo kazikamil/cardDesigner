@@ -89,7 +89,6 @@ export default function Picture(props:HeaderParam)
       const onMouseMoveRightResize = (event:any) => {
         const dx = event.clientX - x;
         x = event.clientX;
-        setCX(x)
         width = width + dx;
         resizeableEle.style.width = `${width}px`;
         setCWidth(width);
@@ -101,7 +100,6 @@ export default function Picture(props:HeaderParam)
   
       const onMouseDownRightResize = (event:any) => {
         x = event.clientX;
-        setCX(x)
         resizeableEle.style.left = styles.left;
         resizeableEle.style.right = null;
         document.addEventListener("mousemove", onMouseMoveRightResize);
@@ -114,9 +112,7 @@ export default function Picture(props:HeaderParam)
         height = height - dy;
         setCHeight(height)
         y = event.clientY;
-        setCY(y)
         resizeableEle.style.height = `${height}px`;
-        
       };
   
       const onMouseUpTopResize = (event:any) => {
@@ -126,7 +122,6 @@ export default function Picture(props:HeaderParam)
       const onMouseDownTopResize = (event:any) => {
         y = event.clientY;
         const styles = window.getComputedStyle(resizeableEle);
-        setCY(y)
         resizeableEle.style.bottom = styles.bottom;
         resizeableEle.style.top = null;
         document.addEventListener("mousemove", onMouseMoveTopResize);
@@ -138,7 +133,6 @@ export default function Picture(props:HeaderParam)
         const dy = event.clientY - y;
         height = height + dy;
         y = event.clientY;
-        setCY(y)
         setCHeight(height)
         resizeableEle.style.height = `${height}px`;
       };
@@ -149,7 +143,6 @@ export default function Picture(props:HeaderParam)
   
       const onMouseDownBottomResize = (event:any) => {
         y = event.clientY;
-        setCY(y)
         const styles = window.getComputedStyle(resizeableEle);
         resizeableEle.style.top = styles.top;
         resizeableEle.style.bottom = null;

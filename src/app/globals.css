@@ -1,33 +1,90 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+.high
+{
+    height: 290px;
+}
+.chrome
+{
+  position: absolute;
+  top: 90px;
+  z-index: 10;
+}
+.high2
+{
+    height: 500px;
+}
+.card1{
+    width: 32rem;
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+}
+.card2{
+    height: 430px;
+}
+.position1{
+    top: -42px;
+    
+}
+.position2{
+    right: -42px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
+  
+  .resizeable {
+    position: absolute;
+    
+    width: 100px;
+    height: 100px;
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 15px;
+    min-height: 15px;
+    
+    cursor: pointer;
   }
-}
-
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
-}
-
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
+  
+  .resizer {
+    position: absolute;
   }
-}
+  
+  .resizer-r {
+    cursor: col-resize;
+    height: 100%;
+    right: 0;
+    top: 0;
+    width: 5px;
+  }
+  
+  .resizer-t {
+    cursor: row-resize;
+    height: 5px;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+  
+  .resizer-b {
+    cursor: row-resize;
+    height: 5px;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+  }
+  
+  .resizer-l {
+    cursor: col-resize;
+    height: 100%;
+    left: 0;
+    top: 0;
+    width: 5px;
+  }
+  .container {
+    position: relative;
+    border: 1px solid black;
+    height:100%;
+    width: 100%;
+    overflow: hidden;
+  }

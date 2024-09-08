@@ -13,55 +13,62 @@ export default function Align(prop:HeaderParam)
     let alignTable=useSelector((state:any)=>state.align.alignTab)
     function align(opt:string)
     {
+        let components:any=[]
+        
         if(alignTable.length==0)
            return;
+        for(let component of alignTable)
+        {
+            let e:any=document.getElementById(component)
+            components.push(e)
+        }
         let val=0,i;
         switch (opt) {
             case 'ch':
                 for(i=0;i<alignTable.length;i++)
-                    val+=alignTable[i].current.offsetLeft;
+                    val+=components[i].offsetLeft;
                 val=val/alignTable.length;
                 for(i=0;i<alignTable.length;i++)
-                    alignTable[i].current.style.left=val+'px';
+                    components[i].style.left=val+'px';
                 break;
             case 'cv':
                 for(i=0;i<alignTable.length;i++)
-                    val+=alignTable[i].current.offsetTop;
+                    val+=components[i].offsetTop;
                 val=val/alignTable.length;
                 for(i=0;i<alignTable.length;i++)
-                    alignTable[i].current.style.top=val+'px';
+                    components[i].style.top=val+'px';
                 break;
             case 'at':
-                val=alignTable[0].current.offsetTop;
+                val=components[0].offsetTop;
                 for(i=1;i<alignTable.length;i++)
-                    if(val>alignTable[i].current.offsetTop)
-                       val=alignTable[i].current.offsetTop;
+                    if(val>components[i].offsetTop)
+                       val=components[i].offsetTop;
                 for(i=0;i<alignTable.length;i++)
-                    alignTable[i].current.style.top=val+'px';
+                    components[i].style.top=val+'px';
                 break;
             case 'al':
-                val=alignTable[0].current.offsetLeft;
+                val=components[0].offsetLeft;
                 for(i=1;i<alignTable.length;i++)
-                    if(val>alignTable[i].current.offsetLeft)
-                       val=alignTable[i].current.offsetLeft;
+                    if(val>components[i].offsetLeft)
+                       val=components[i].offsetLeft;
                 for(i=0;i<alignTable.length;i++)
-                    alignTable[i].current.style.left=val+'px';
+                    components[i].style.left=val+'px';
                 break;  
             case 'ab':
-                val=alignTable[0].current.offsetTop;
+                val=components[0].offsetTop;
                 for(i=1;i<alignTable.length;i++)
-                    if(val<alignTable[i].current.offsetLeft)
-                       val=alignTable[i].current.offsetLeft;
+                    if(val<components[i].offsetLeft)
+                       val=components[i].offsetLeft;
                 for(i=0;i<alignTable.length;i++)
-                    alignTable[i].current.style.top=val+'px';
+                    components[i].style.top=val+'px';
                 break;
             case 'ar':
-                val=alignTable[0].current.offsetLeft;
+                val=components[0].offsetLeft;
                 for(i=1;i<alignTable.length;i++)
-                    if(val<alignTable[i].current.offsetLeft)
-                       val=alignTable[i].current.offsetLeft;
+                    if(val<components[i].offsetLeft)
+                       val=components[i].offsetLeft;
                 for(i=0;i<alignTable.length;i++)
-                    alignTable[i].current.style.left=val+'px';
+                    components[i].style.left=val+'px';
                 break;
         }
     }

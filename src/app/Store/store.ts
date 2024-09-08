@@ -6,6 +6,7 @@ import textReducer from "./features/textSlice";
 import alignReducer from "./features/align";
 import rvnReducer from "./features/rvnSlice";
 import apiReducer from "./features/api";
+import configReducer from "./features/conifg"
 export const store=configureStore({
     reducer:{
         tool:toolReducer,
@@ -14,6 +15,7 @@ export const store=configureStore({
         text:textReducer,
         align:alignReducer,
         rvn:rvnReducer,
-        api:apiReducer
+        api:apiReducer,
+        config:configReducer,
     }
 })

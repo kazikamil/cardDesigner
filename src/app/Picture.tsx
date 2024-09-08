@@ -5,17 +5,37 @@ import {Resizable} from "react-resizable"
 import 'react-resizable/css/styles.css'
 import { useDispatch, useSelector } from "react-redux";
 import { add, remove } from "./Store/features/align";
-import textSlice from "./Store/features/textSlice";
+import textSlice, { setTxt } from "./Store/features/textSlice";
 import Barcode from "react-barcode";
 import QRCode from "react-qr-code";
+import { addE, pushDel, setRef } from "./Store/features/conifg";
+
+import '@fontsource/cairo/500.css'
 type HeaderParam={
-  containerRef:any
+  id:any
 }
 export default function Picture(props:HeaderParam)
 {
+    let pRef=useRef<any>(null)
+    let imgRef=useRef<any>(null)
+    let bRef=useRef<any>(null)
+    let [textY,setTextY]=useState(0)
     let Bcolor=useSelector((state:any)=>state.sizePos.backC)
+    let density=useSelector((state:any)=>state.config.density)
+    let [imgData,setImgData]=useState('')
+    let [thikness,setThikness]=useState(0)
     let [Bco,setBco]=useState({r:255,g:0,b:0,a:1})
+    let [dotsX,setDotsX]=useState(0)
+    let [dotsY,setDotsY]=useState(0)
+    let [dotsHeight,setDotsHeight]=useState(0)
+    let [dotsWidth,setDotsWidth]=useState(0)
+    let [fWeight,setWeight]=useState('100')
+    let weight=useSelector((state:any)=>state.text.weight) 
+    let bType=useSelector((state:any)=>state.api.bType) 
+    let thick=useSelector((state:any)=>state.sizePos.thick) 
     let color=useSelector((state:any)=>state.text.color) 
+    let height=useSelector((state:any)=>state.config.height)
+    let max=useSelector((state:any)=>state.config.max) 
     let hidden=useSelector((state:any)=>state.api.hidden) 
     let [cl,setCl]=useState('black')
     let value=useSelector((state:any)=>state.api.value)
@@ -25,12 +45,13 @@ export default function Picture(props:HeaderParam)
     let font=useSelector((state:any)=>state.text.font)
     let [fn,setFont]=useState('')
     let px=useSelector((state:any)=>state.text.size)
-    let [size,setS]=useState(0)
+    let [size,setS]=useState(20)
     let [ImageSrc,SetSrc]=useState<string|ArrayBuffer|null>('')
     let alignTable=useSelector((state:any)=>state.align.alignTab)
     let [index,setInd]=useState(0)
     let dispatch=useDispatch()
     let [Clicked,setClicked]=useState(false)
+    let deletedElements=useSelector((state:any)=>state.config.deletedElements)
     let val=useSelector((state:any)=>state.sizePos.val)
     let opt=useSelector((state:any)=>state.sizePos.option)
     let txt=useSelector((state:any)=>state.text.text)
@@ -43,22 +64,20 @@ export default function Picture(props:HeaderParam)
     let [cY,setCY]=useState(0)
     let [cX,setCX]=useState(0)
     if (tool=="resize"&&Clicked)
-       {style="border-dashed border-black border-2"
+       {style="outline outline-[2px] outline-dashed outline-black"
        }
     else if(Clicked)
        {
         display='hidden'
-        style="border-solid border-black border-2"        
+        style="shadow-[0_0_0_2px_rgba(0,0,0,1)]"        
        }       
     else style=""    
-    const ref = useRef(null);
-    const refLeft = useRef(null);
-    const refTop = useRef(null);
-    const refRight = useRef(null);
-    const refBottom = useRef(null);
-    const containerRef = props.containerRef
-    
-    
+    const ref = useRef<any>(null);
+    const refLeft = useRef<any>(null);
+    const refTop = useRef<any>(null);
+    const refRight = useRef<any>(null);
+    const refBottom = useRef<any>(null);
+    const containerRef = useSelector((state:any)=>state.config.containerRef)
   const isClicked = useRef<boolean>(false);
 
   const coords = useRef<{
@@ -76,6 +95,7 @@ export default function Picture(props:HeaderParam)
     useEffect(() => {
       console.log(tool+"hi")
       if(tool=='select') return;
+      if(!ref.current) return;
       const resizeableEle:any = ref.current;
       const styles = window.getComputedStyle(resizeableEle);
       let width = parseInt(styles.width, 10);
@@ -172,6 +192,7 @@ export default function Picture(props:HeaderParam)
       };
   
       // Add mouse down event listener
+      if(!refRight.current||!refTop.current||!refLeft.current||!refBottom.current) return;
       const resizerRight:any = refRight.current;
       resizerRight.addEventListener("mousedown", onMouseDownRightResize);
       const resizerTop:any = refTop.current;
@@ -191,6 +212,7 @@ export default function Picture(props:HeaderParam)
     useEffect(()=>{
       if(Clicked&&tool=='select'&&ref.current)
       {
+        console.log(val)
          let Ele:any=ref.current
          switch (opt) {
           case 'y':
@@ -228,41 +250,69 @@ export default function Picture(props:HeaderParam)
       if(Clicked) setBco(Bcolor)
     },[Bcolor])
     useEffect(() => {
-      if (!ref.current || !containerRef.current || tool=='resize') return;
+      if (!ref.current || !containerRef.current || tool==='resize') { console.log({tool:'no select'}); return;}
   
       const box :any = ref.current;
-      const container = containerRef.current;
-  
+      const container = document.getElementById('ref')
+      if(!container) return
   
       const onMouseDown = (e: MouseEvent) => {
+        try{
+        if(!ref.current) return
+        if(isClicked.current===null)return;
         isClicked.current = true;
+        if(!coords.current) return
         coords.current.startX = e.clientX;
         coords.current.startY = e.clientY;
+        }
+        catch {
+          console.log('mouseDown')
+        }
       }
   
       const onMouseUp = (e: MouseEvent) => {
+        try {
+        if(!ref.current) return
+        console.log("event")
+        if(!isClicked.current)return;
         isClicked.current = false;
+        if(!coords.current) return
+        if(!box) return;
         coords.current.lastX = box.offsetLeft;
         coords.current.lastY = box.offsetTop;
+        }
+        catch {
+          console.log('onMouseUp')
+        }
       }
   
       const onMouseMove = (e: MouseEvent) => {
+        try {
+        if(!ref.current) return
         if (!isClicked.current) return;
-  
+        if(!coords.current) return
         const nextX = e.clientX - coords.current.startX + coords.current.lastX;
         const nextY = e.clientY - coords.current.startY + coords.current.lastY;
-  
+        if(!box) return;
         box.style.top = `${nextY}px`;
         box.style.left = `${nextX}px`;
         setCY(nextY)
         setCX(nextX)
+        }
+        catch {
+          console.log('on Mouse mouve')
+        }
       }
-  
+      if(!box) return
+      try {
       box.addEventListener('mousedown', onMouseDown);
-      box.addEventListener('mouseup', onMouseUp);
+      document.addEventListener("mouseup", onMouseUp);
       container.addEventListener('mousemove', onMouseMove);
       container.addEventListener('mouseleave', onMouseUp);
-  
+      }
+      catch {
+        console.log('add Event')
+      }
       const cleanup = () => {
         box.removeEventListener('mousedown', onMouseDown);
         box.removeEventListener('mouseup', onMouseUp);
@@ -274,71 +324,296 @@ export default function Picture(props:HeaderParam)
     }, [tool])
     useEffect(()=>{
       if(Clicked&&tool=='txt')
-        { setText(txt); SetSrc('')}
+        { setText(txt);
+          setCuQr('')
+          setValue('')
+           SetSrc('')
+        }
     },
     [txt])
     useEffect(()=>{
-      if(Clicked) setS(px)
+      if(Clicked)
+        { setBco({r:255,g:0,b:0,a:0})
+          console.log("finish")
+          console.log(Bco)
+          if(txt)
+          {
+            if (pRef.current && ref.current) {
+              let p :any= pRef.current;
+              p.innerText=txt
+              let rect = p.getBoundingClientRect();
+              let pi :any= ref.current;
+              pi.style.height = rect.height+ "px";
+              pi.style.width = rect.width + "px";
+            }
+          }
+        }
+    },[txt])
+    useEffect(()=>{
+      if(Clicked){ setS(px)
+        if (pRef.current && ref.current) {
+          let p :any= pRef.current;
+          let rect = p.getBoundingClientRect();
+          let pi :any= ref.current;
+          pi.style.height = p.offsetHeight+ "px";
+          pi.style.width = p.offsetWidth + "px";
+          setCWidth(rect.width)
+          setCHeight(rect.height)
+        }
+      }
     },[px])
+    useEffect(()=>{
+      console.log({thick})
+      if(Clicked) setThikness(thick)
+        console.log({thikness})
+    },[thick])
     useEffect(()=>{
       if(Clicked) setFont(fn)
     },[font])
+    useEffect(() => {
+      if (Clicked) {
+        setValue(value);
+        let rect;
+        
+        if (value) {
+          console.log({ value });
+         
+            
+            setCuQr('');
+            setText('');
+            setImgData('');
+            setBco({r:255,g:0,b:0,a:0})
+        }
+      }
+    }, [value]);
     useEffect(()=>{
-      if(Clicked) setValue(value)
-        console.log(valueC)
-    },[value])
-    useEffect(()=>{
-      if(Clicked) setCuQr(qr)
+           
+           if(Clicked) {setCuQr(qr);setText('');setValue('');setImgData('');setBco({r:255,g:0,b:0,a:0})}
         console.log(qr)
     },[qr])
     useEffect(()=>{
       if(Clicked) setCl(color)
     },[color])
+    useEffect(()=>{
+      console.log({weight})
+      if(Clicked){console.log('weight'); setWeight(weight)}
+    },[weight])
     function changeC()
     {
+      if(tool==='Supp'){ dispatch(pushDel(props.id));return; }
       if(Clicked){
           setClicked(false)
+          if(ref.current)
           dispatch(remove(index))
         }
       else if(!Clicked){
          setClicked(true);
-         dispatch(add(ref))
-         index=alignTable.length-1
-         console.log('h'+alignTable[0]+alignTable[1])
+         if(ref.current)
+         {dispatch(add(props.id))
+         index=alignTable.length-1}
+         //console.log('h'+alignTable[0]+alignTable[1])
         }  
     } 
     function handleClick()
     {
-       document.getElementById("fileInput")?.click();
+       document.getElementById(`fileInput${props.id}`)?.click();
     }
     function handleFileChange(event:any)
     {
+      let win:any=window
       const file=event.target.files[0];
       const reader= new FileReader()
       reader.onload=(e)=>{
         if(e.target&&e.target.result)
-           SetSrc(e.target.result)
+           {SetSrc(e.target.result)
+           console.log('before')
+           win.BrowserPrint.convert(e.target.result,
+            null,{toFormat:'zpl',action:'return',resize:{width:cWidth,height:cHeight}},(data:any)=>{
+             console.log(data.data)
+             setImgData(data.data)
+             console.log('after')
+            },null
+            )
+           
            setText('')
+           setBco({r:255,g:0,b:0,a:0})
+           setCuQr('')
+           setValue('')
+           }
       }
       reader.readAsDataURL(file)
     }
+    useEffect(()=>{
+      if(ImageSrc)
+      {let img:any=imgRef.current;
+      let rect:any=img.getBoundingClientRect()
+      let div:any=ref.current;
+      div.style.height=rect.height+"px";
+      div.style.width=rect.width+"px";}
+    },[ImageSrc])
+
+
+    useEffect(()=>{
+      console.log({density})
+      let d= parseFloat(density);
+      let cmY
+      let cmX=cX*2*max/1000;
+      
+      setDotsX(cmX*10*d+45)
+      if(text)
+      { let hTextH:any=size/80
+
+       cmY=cY*2*max/959+hTextH;
+      }
+      else cmY=cY*30/1000;
+      setDotsY(cmY*10*d)
+      let cmWidth=cWidth*30/1000
+      setDotsWidth(cmWidth*10*d)
+      let cmHeight=cHeight*30/1000
+      setDotsHeight(cmHeight*10*d)
+      console.log({textY,cmY})
+      console.log({cmHeight,cmWidth})
+      console.log({cX,cY,cmX,cmY,d})
+    },[cY,cHeight,cWidth,cX,density,max])
+    useEffect(()=>{
+      if(cuQr)
+      {if(cWidth>cHeight)
+      {
+        let div:any=ref.current
+        div.style.height=cWidth+"px"
+      }
+      else
+      {
+        let div:any=ref.current
+        div.style.width=cHeight+"px"
+      }}
+
+    },[cWidth,cHeight])
+    useEffect(()=>{
+      if(text)
+      {
+        
+        setTextY((cHeight-size)/2+cY)
+      }
+    },[cY])
+    useEffect(()=>{
+      let win:any=window
+      if(ImageSrc)
+      {
+          console.log('before')
+          console.log({cHeight,cWidth})
+          win.BrowserPrint.convert(ImageSrc,
+           null,{toFormat:'zpl',action:'return',resize:{width:500,height:500}},(data:any)=>{
+            console.log(data.data)
+            setImgData(data.data)
+            console.log('after')
+           },null
+           )
+      }
+    },[cHeight,cWidth])
+    useEffect(()=>{
+      dispatch(addE({id:props.id,dotsX,dotsWidth,dotsY,dotsHeight,text,imgData,valueC,cuQr,bType:valueC?bType:null}))
+    },[dotsX,dotsWidth,dotsHeight,dotsY,valueC,cuQr,text,imgData,bType])
+    function handleInput(event:any)
+    {
+      setText(event.target.innerText)
+      dispatch(setTxt(event.target.innerText))
+    }
+    
+    const handleDragStart = (event:any) => {
+      console.log({index})
+      event.dataTransfer.setData("text/plain", parseInt(event.target.id));
+      if(Bco)
+        event.target.style.opacity = Bco.r;
+      else  
+      event.target.style.opacity ='1';
+      };
+    
+    const handleDragEnd = (event:any) => {
+      if(Bco)
+        event.target.style.opacity = Bco.r;
+      else  
+      event.target.style.opacity ='1';
+      };
     return (
        //<div ref={containerRef} className="container">
-        <div ref={ref} className={"resizeable "+style} onClick={()=>changeC()} onDoubleClick={handleClick} style={{backgroundColor:`rgba(${Bcolor.r},${Bcolor.g},${Bcolor.b},${Bcolor.a})`}}>
-          <input id="fileInput" type="file" style={{display:'none'}} onChange={handleFileChange} />
-          <p className={text==''?'hidden':''} style={{fontSize:size+'px',fontFamily:font,color:cl}}>{text}</p>
-          <img className={ImageSrc==""? 'hidden':''} src={ImageSrc?(typeof ImageSrc==='string'?ImageSrc:''):''} style={{width:'100%',height:'100%',objectFit:'contain'}} />
-          <div width={cWidth} height={cHeight} x={cX} y={cY} title="barcode" className={(valueC==""||hidden)? 'hidden':''}>
-            <Barcode value={valueC}/>
-          </div>
-          <div height={cHeight} title="qrcode" x={cX} y={cY} className={(cuQr==""||hidden)? 'hidden':'w-full h-full'}>
-             <QRCode className="w-full h-full" value={cuQr} />
-          </div>
-          <div ref={refLeft} className={"resizer resizer-l "+display}></div>
-          <div ref={refTop} className={"resizer resizer-t "+display}></div>
-          <div ref={refRight} className={"resizer resizer-r "+display}></div>
-          <div ref={refBottom} className={"resizer resizer-b "+display}></div>
+        <div 
+        onDragEnd={handleDragEnd} id={props.id} draggable={Clicked?"false":"true"}  onDragStart={(event:any)=>{handleDragStart(event)}} ref={ref} className={` resizeable ${(hidden&&(valueC||cuQr))?'opacity-0':''}`+style} onClick={()=>changeC()} onDoubleClick={()=>{handleClick(); }} style={{backgroundColor:`rgba(${Bco.r},${Bco.g},${Bco.b},${Bco.a})`}} >
+         {
+             hidden==false&&
+            <input  id={`fileInput${props.id}`} type="file" style={{display:'none'}} onChange={handleFileChange} />
+          }
+          {
+            text&&<div title="text" data-content={text} data-width={Math.round(dotsWidth)} data-x={Math.round(dotsX)} data-y={Math.round(dotsY)}>
+              <p  onInput={handleInput} data-font={font.replace(/ /g,"_")} contentEditable="true" ref={pRef} title="text"  /*height={(size*30/1000)*density*10}*/  style={{fontWeight:`${fWeight}`,fontSize:size+'px',fontFamily:font+',monospace',color:cl,whiteSpace:"nowrap", outline:'none'}}></p>
+            </div>
+            
+          } 
+          {
+             thikness!=0&&
+             (<hr className="w-full" style={{ borderTop: `${thikness}px solid #000` }}></hr>)
+            }
+          {
+            ImageSrc&&
+            (<div style={{width:'100%',height:'100%',}} title="img" data-content={imgData} data-x={dotsX} data-y={dotsY}>
+              {!hidden &&<img style={{width:'100%',height:'100%',objectFit:'inherit'}} className="border border-blue-400"  ref={imgRef} src={ImageSrc?(typeof ImageSrc==='string'?ImageSrc:''):''} data-content={imgData}  />}
+            </div>)
+          }
+          
+            
+            {
+              valueC&&
+              <div  className="h-full w-full " data-format={bType} ref={bRef} data-width={Math.round(dotsWidth/(valueC.length*11+33))} data-height={Math.round(dotsHeight)} data-x={Math.round(dotsX)} data-y={Math.round(dotsY)} data-content={valueC} title="barcode">
+              {
+                !hidden&&
+            <Barcode format={bType} width={Math.round(cWidth/(valueC.length*11+bType==='EAN8'?45:bType==='codabar'?70:67))}  height={cHeight-30}   margin={0}     value={valueC}
+            />
+              }
+            </div>
+            }
+            {
+              cuQr&&
+              <div data-height={Math.round(cHeight*22/height)} title="qrcode" data-x={Math.round(dotsX)} data-y={Math.round(dotsY)} data-content={cuQr} className={(cuQr==""||hidden)? 'hidden':'w-full h-full'}>
+             {
+            (!hidden)&&
+              <QRCode className="w-full h-full" value={cuQr} />
+             }
+             
+            </div>
+            
+            }
+            
+          
+          {
+            !hidden&&<div ref={refLeft} className={`resizer resizer-l ${(tool!='resize'||!Clicked)?'hidden':''}`}></div>
+          }
+          {
+            !hidden&&<div ref={refTop} className={`resizer resizer-t ${(tool!='resize'||!Clicked)?'hidden':''}`}></div>
+          }
+          {
+          !hidden&&<div ref={refBottom} className={`resizer resizer-b ${(tool!='resize'||!Clicked)?'hidden':''}`}></div>
+          }
+          {
+            !hidden&&<div ref={refRight} className={`resizer resizer-r ${(tool!='resize'||!Clicked)?'hidden':''} `}></div>
+          }
+          
         </div>
-       
     );
 }
+/* à faire
+-- image prend tout le espace du div //fait
+-- couper les rangées en deux //fait
+-- former xml du design //fait
+-- inserer les fonts en visuel et en zpl //99% fait
+-- supprimer un element//fait
+-- add list of printers //fait
+-- delete a comppnent with click //fait
+-- ajouter dans le design la line et le rectangle (hr [border top(thikness)]) //fait
+-- ajouter les types de code barres et renover le xml et xslt //99% data matrix
+-- regler align ref // 99% check align bottom and click and don't align
+-- uploader un xml 
+-- add undo redo
+-- regler l'affichage des barcodes //99% 
+-- grammaire xml 
+-- ajoute une div d'erreur
+*/

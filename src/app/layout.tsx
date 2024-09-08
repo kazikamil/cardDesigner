@@ -16,10 +16,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <script src="http://localhost:8097"></script>
+        <title>Create Next App</title>
+        <script src="/BrowserPrint-3.0.216.min.js"></script>
+        <script src="https://d3js.org/d3.v7.min.js"></script>
+      </head>
       <body className="bg-slate-100">
-       
         {children}
-       
       </body>
       
     </html>

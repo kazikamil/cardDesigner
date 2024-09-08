@@ -10,6 +10,8 @@ import Resize from "./img/Resize.png"
 import txt from "./img/Txt.png"
 import ImageLib from "./img/ImgLib.png"
 import Qr from "./img/Qr.png"
+import Garbage from "./img/garbage.svg"
+import Line from './img/Line.png'
 type HeaderParam=
 {
   func:(text:string)=>undefined;
@@ -27,13 +29,15 @@ const images:ImgC[]=[
   {image:Qr,clicked:false,tool:"qr"},
   {image:ImageLib,clicked:false,tool:""},
   {image:Brc,clicked:false,tool:"barcode"},
-  {image:AImg,clicked:false,tool:"AImg"}
+  {image:AImg,clicked:false,tool:"AImg"},
+  {image:Garbage,clicked:false,tool:"Supp"},
+  {image:Line,clicked:false,tool:"line"},
 ]
 export default function SideBar()
 {
     //const [option,setOption]=useState("sl")
     return(
-        <div className="p-1 w-10 high bg-neutral-800 ">
+        <div className="p-1 w-10  bg-neutral-800 ">
           <ul>
             {images.map((image,index)=>(
               <Btn key={index} image={image.image} tool={image.tool}/>

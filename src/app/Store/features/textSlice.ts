@@ -2,8 +2,9 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState={
     text:'',
     size:20,
-    font:'Arial',
-    color:'black'
+    font:'Roboto Mono',
+    color:'black',
+    weight:'100'
 }
 const textSlice=createSlice({
     name:"text",
@@ -24,11 +25,16 @@ const textSlice=createSlice({
         setColor:(state,action)=>
         {
             state.color=action.payload
-        }
+        },
+        setWeight:(state,action)=>
+            {
+                state.weight=action.payload
+            }
     }
 })
 export const {setTxt}=textSlice.actions
 export const {setSize}=textSlice.actions
 export const {setF}=textSlice.actions
 export const {setColor}=textSlice.actions
+export const {setWeight}=textSlice.actions
 export default textSlice.reducer

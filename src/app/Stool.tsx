@@ -18,6 +18,7 @@ export default function Stool(){
     let dispatch=useDispatch()
     function handleChange(event:any,opt:string)
     {
+      console.log({opt,val:event.target.value})
         dispatch(setOption(opt))
         dispatch(setVal(event.target.value))
     }

@@ -3,7 +3,7 @@
 @tailwind utilities;
 .high
 {
-    height: 290px;
+    height: 310px;
 }
 .chrome
 {
@@ -11,6 +11,7 @@
   top: 90px;
   z-index: 10;
 }
+
 .high2
 {
     height: 500px;
@@ -88,3 +89,76 @@
     width: 100%;
     overflow: hidden;
   }
+  .axis path,
+    .axis line {
+      fill: none;
+      stroke: black;
+      shape-rendering: crispEdges;
+    }
+    .axis text {
+      font-size: 8px; /* Réduit la taille de la police pour éviter le chevauchement */
+    }
+    .rotated-range {
+      transform: rotate(90deg);
+      transform-origin: left bottom;
+  }
+  input[type="range"] {
+    -webkit-appearance: none; /* Enlève le style par défaut de l'élément */
+    width: 100%; /* Largeur de l'élément */
+    
+    background:transparent; /* Rend la piste transparente */
+    border-radius: 5px; /* Coins arrondis */
+    outline: none; /* Retire le contour */
+    width: 483px;
+    opacity: 1; /* Assure que l'élément lui-même est visible */
+}
+
+/* Style de la poignée pour les navigateurs WebKit */
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; /* Enlève le style par défaut de la poignée */
+    width: 10px; /* Largeur de la poignée */
+    height: 10px; /* Hauteur de la poignée */
+    background: #2474be; /* Couleur de la poignée */
+    cursor: pointer; /* Curseur en forme de main */
+    border-radius: 50%; /* Forme ronde */
+}
+
+/* Style de la poignée pour Firefox */
+input[type="range"]::-moz-range-thumb {
+    width: 10px; /* Largeur de la poignée */
+    height: 10px; /* Hauteur de la poignée */
+    background: #4CAF50; /* Couleur de la poignée */
+    cursor: pointer; /* Curseur en forme de main */
+    border-radius: 50%; /* Forme ronde */
+}
+
+/* Style de la piste pour Firefox */
+input[type="range"]::-moz-range-track {
+    background: transparent; /* Rend la piste transparente */
+}
+
+/* Style de la piste pour IE */
+input[type="range"]::-ms-track {
+    width: 100%;
+    height: 8px;
+    background: transparent; /* Rend la piste transparente */
+    border-color: transparent;
+    color: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar {
+  width: 10px; /* Largeur de la barre de défilement */
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f1f1f1; /* Couleur de la piste de défilement */
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #505050; /* Couleur de la barre de défilement */
+  border-radius: 6px; /* Arrondir les coins */
+  border: 3px solid #f1f1f1; /* Couleur du fond pour espacer la barre de défilement */
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #555; /* Couleur de la barre au survol */
+}

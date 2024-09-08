@@ -1,9 +1,10 @@
 "use client"
 import React, { useState } from "react"
-import { useDispatch } from "react-redux";
-import { put } from "./Store/features/api";
+import { useDispatch, useSelector } from "react-redux";
+import { put, setBType } from "./Store/features/api";
 export default function Btool(){
     let [type,Stype]=useState('C128')
+    let bType=useSelector((state:any)=>state.api.bType) 
     let [code,setC]=useState('')
     let data;
     let dispatch=useDispatch()
@@ -14,11 +15,16 @@ export default function Btool(){
     return(
         <form className="w-full h-full flex justify-center ">
            <div className="flex items-center border-b border-slate-500 w-50 m-1 mr-10 ">
-            <input onChange={(event)=>dispatch(put(event.target.value))} className="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" type="text" placeholder="What you want to code?" aria-label="Full name"/>
+            <input pattern={bType==="EAN8"?'^\d{7,8}$':`${bType==='pharmacode'?"^[3-9]\d{0,4}|1[01]\d{0,4}|12[0-7]\d{0,3}|130[0-9]\d{0,2}|1310[0-6]\d|131070$":`${bType==='codabar'?'^[ABCD][0-9\-\$\:\/\.\+]+[ABCD]$':'.*'}`}`}
+             onChange={(event)=>dispatch(put(event.target.value))} className="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" type="text" placeholder="What you want to code?" aria-label="Full name"/>
            </div>
-            <select onChange={(event)=>Stype(event.target.value)} className="block appearance-none w-30  border-b border-slate-500 hover:border-gray-500 px-4 pr-8 text-xs  leading-tight focus:outline-none focus:shadow-outline m-1">
-              <option value={'C128'}>Code 128</option>
-              <option value={'C64'}>Code 64</option>
+            <select onChange={(event)=>dispatch(setBType(event.target.value))} className="block appearance-none w-30  border-b border-slate-500 hover:border-gray-500 px-4 pr-8 text-xs  leading-tight focus:outline-none focus:shadow-outline m-1">
+              <option value={'CODE128'}>Code 128</option>
+              <option value={'CODE39'}>Code 39</option>
+              <option value={'EAN13'}>EAN-13</option>
+              <option value={'EAN8'}>EAN-8</option>
+              <option value={'pharmacode'}>pharmacode</option>
+              <option value={'codabar'}>codabar</option>
             </select>
            <div className="inline-block relative w-30 "> 
             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">

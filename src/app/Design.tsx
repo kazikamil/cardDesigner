@@ -8,6 +8,7 @@ import Picture from "./Picture";
 import { useEffect } from "react";
 import { setContainerRef, setHeight, setLHeight, setLWidth, setWidth } from "./Store/features/conifg";
 import { Icon } from '@iconify/react';
+import { setNr } from "./Store/features/rvnSlice";
 export default function Design()
 {
 
@@ -22,8 +23,16 @@ export default function Design()
    let composantsV=[]
    let [values,setValues]=useState([5,50,5,50])
    let containerRef=useRef<HTMLDivElement>(null)
+   let [qrs,setQrs]=useState<any>([])
+   let [brcs,setBrcs]=useState<any>([])
+   let [txts,setTxts]=useState<any>([])
    let cla:string=useSelector((state:any)=>state.rotate.class)
    let deletedElements=useSelector((state:any)=>state.config.deletedElements)
+   let [addedE,pushAddE]=useState<any>([])
+   let qrCode=useSelector((state:any)=>state.config.qrCodes)
+   let barcode=useSelector((state:any)=>state.config.barcodes)
+   let text=useSelector((state:any)=>state.config.texts)
+   let image=useSelector((state:any)=>state.config.image)
    let clas:string=`border border-solid border-black ${cla} absolute`
    let rv:string=useSelector((state:any)=>state.rvn.rectVers)
    let hidden:any=useSelector((state:any)=>state.api.hidden)
@@ -31,8 +40,10 @@ export default function Design()
    let lHeight:any=useSelector((state:any)=>state.config.lHeight)
    let nr=useSelector((state:any)=>state.rvn.nr)
    let nv=useSelector((state:any)=>state.rvn.nv)
+   let attributes=useSelector((state:any)=>state.config.attributes)
    let max=useSelector((state:any)=>state.config.max)
    let dispatch=useDispatch()
+   let [turn,setTurn]=useState(0)
    function handleChangeRange(event:any,ref:any)
    {
      let top,left,width,height;
@@ -53,7 +64,7 @@ export default function Design()
       console.log("ref1")
       console.log({left,width,left1:thumbX1,left2:thumbX2})
       design.style.width=width+'px'
-      dispatch(setLWidth(Math.round(width*max*2/1000)))
+      dispatch(setLWidth(Math.round(width*max*2/950)))
       dispatch(setWidth(width))
       let design1=design.getBoundingClientRect()
       design.style.left=(design.offsetLeft+(left-design1.left))+'px'
@@ -73,7 +84,7 @@ export default function Design()
       console.log("ref1")
       console.log({left,height,left1:thumbY1,left2:thumbY2})
       design.style.height=height+'px'
-      dispatch(setLHeight(Math.round(height*max*2/1000)))
+      dispatch(setLHeight(Math.round(height*max*2/970)))
       dispatch(setHeight(height))
       let design1=design.getBoundingClientRect()
       design.style.top=(design.offsetTop+(top-design1.top))+'px'
@@ -144,21 +155,92 @@ export default function Design()
     useEffect(()=>{
       console.log({deletedElements})
     },[deletedElements])
-    useEffect(() => {
-      const newComponents = []; // Créez un tableau temporaire pour accumuler les composants
-      for (let i = 0; i < nr; i++) {
-          if (deletedElements.includes(i)) continue;
-          newComponents.push(<Picture id={i} key={i}  />);
-      }
-      setComp(newComponents); // Mettez à jour l'état une seule fois
-  }, [nr, deletedElements]);  
-   /*for(let i=0;i<nv;i++)
+    useEffect(()=>{
+      console.log(qrCode)
+      if(!qrCode) return;
+      if(!qrCode.length) return;
+      let cqrs=[]
+      let tab:any=addedE
+      for(let i=nr;i<qrCode.length+nr;i++)
       {
-         composantsV.push(<Picture key={i} containerRef={containerRef}/>)
-      }   */
+        console.log({i})
+        tab.push(i)
+        console.log({tab}) 
+        cqrs.push({index:i,qr:qrCode[i-nr]})
+      }
+      pushAddE(tab)
+      console.log(cqrs)
+      setTimeout(()=>{
+      dispatch(setNr(nr+qrCode.length))
+      },2000)
+      console.log(cqrs[0].index)
+      let newTab=[...qrs,...cqrs]
+      setQrs(newTab)
+    },[qrCode])
      useEffect(()=>{
-      dispatch(setContainerRef(containerRef))
-     },[containerRef])
+      console.log(barcode)
+      console.log(barcode.length)
+      if(!barcode) return;
+      console.log(barcode.length)
+      if(!barcode.length) return;
+      console.log(barcode)
+      let brs=[];
+      let tab=addedE
+      for(let i=nr;i<barcode.length+nr;i++)
+        {
+          console.log({i})
+          tab.push(i)
+          console.log({tab}) 
+          brs.push({index:i,br:barcode[i-nr]})
+        }
+        pushAddE(tab)
+        console.log(brs)
+        setTimeout(()=>{
+        dispatch(setNr(nr+barcode.length))
+        },2000)
+        console.log(brs[0].index)
+        let newTab=[...brcs,...brs]
+        setBrcs(newTab)
+     },[barcode])
+     useEffect(()=>{
+      if(!text) return;
+      if(!text.length) return;
+      console.log(text)
+      let txs=[];
+      let tab=addedE
+      for(let i=nr;i<text.length+nr;i++)
+        {
+          console.log({i})
+          tab.push(i)
+          console.log({tab}) 
+          txs.push({index:i,txt:text[i-nr]})
+        }
+        pushAddE(tab)
+        console.log(txs)
+        setTimeout(()=>{
+        dispatch(setNr(nr+barcode.length))
+        },2000)
+        console.log(txs[0].index)
+        let newTab=[...txts,...txs]
+        setTxts(newTab)
+     },[text])
+     useEffect(()=>{
+      console.log({attributes})
+      let width=attributes.Width*950/(max*2)
+      let height=attributes.Height*970/(max*2)
+      let top=500-height/2
+      let left=518 -height/2
+      let design:any=designRef.current
+      console.log(design.offsetTop)
+      design.style.top=top +'px' //(design.offsetTop+(top-design1.top))+'px'
+      design.style.left=left +'px'//(design.offsetTop+(left-design1.left))+'px'
+      design.style.width=width + 'px' //(design.offsetTop+(width-design1.width))+'px'
+      design.style.height=height +'px' // (design.offsetTop+(height-design1.height))+'px'
+      console.log({left,top,height,width})
+     },[attributes])
+     useEffect(()=>{
+      console.log(qrs)
+     },[qrs])
    return(
    <div id="ref" ref={containerRef} className="overflow-y-scroll custom-scrollbar overflow-x-hidden h-full w-full flex p-20 justify-center h-screen relative">
         {<svg className=" fixed  top-20 left-[33px]" ref={svgRef} width={1000} height={1000}></svg>
@@ -180,8 +262,24 @@ export default function Design()
         <div id="recto" className={rv==='v'?'hidden bg-white':'bg-white'}>
         {hidden&&<Icon className="absolute w-20 h-20 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 " icon="svg-spinners:blocks-shuffle-2"  style={{color: '#116fd4'}} />}
         {Array.from({ length: nr }, (_, index) => (
-          !(deletedElements.includes(index))&&<Picture id={index} key={index}/>
-        ))}
+          !(deletedElements.includes(index))&&(!addedE.includes(index))&&<Picture id={index} key={index} containerRef={containerRef}/>
+        ))
+        }
+        {
+          qrs.map((item:any, index:number) => (
+            !(deletedElements.includes(item.index))&&<Picture id={item.index} key={item.index} containerRef={containerRef} cuQr={item.qr['@attributes'].Code} x={item.qr['@attributes'].X} y={item.qr['@attributes'].Y} height={item.qr['@attributes'].Height}/>
+           ))
+        }
+        {
+          brcs.map((item:any, index:number) => (
+            !(deletedElements.includes(item.index))&&<Picture id={item.index} key={item.index} containerRef={containerRef} x={item.br['@attributes'].X} y={item.br['@attributes'].Y} height={item.br['@attributes'].Height} width={item.br['@attributes'].Width} type={item.br['@attributes'].Symbology} valueC={item.br['@attributes'].Code} />
+           ))
+        }
+        {
+          txts.map((item:any, index:number) => (
+            !(deletedElements.includes(item.index))&&<Picture id={item.index} key={item.index} containerRef={containerRef} text={item.tx['@attributes'].text} x={item.tx['@attributes'].X} y={item.tx['@attributes'].Y}  />
+           ))
+        }
         </div>
        
           

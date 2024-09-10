@@ -66,9 +66,10 @@ export default function Config()
           setXml(jsonResult);
           let thermalLabel=jsonResult.ThermalLabel['@attributes'];
           let qrCode=jsonResult.ThermalLabel.qrCode
-          let barcodeItem=jsonResult.ThermalLabel.barcode
+          let barcodeItem=jsonResult.ThermalLabel.barcodeItem
           let image=jsonResult.ThermalLabel.image
           let textItem=jsonResult.ThermalLabel.textItem
+          console.log(barcodeItem)
           dispatch(pushBr(barcodeItem))
           dispatch(pushImg(image))
           dispatch(pushQr(qrCode))

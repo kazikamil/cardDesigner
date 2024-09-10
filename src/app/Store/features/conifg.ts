@@ -68,6 +68,7 @@ const configSlice=createSlice({
         addE: (state,action)=>
             {
                 console.log(action.payload)
+                if(action.payload.id==0 ||action.payload.id)
                 state.elements[action.payload.id]=action.payload
             },
         setLHeight: (state,action) => {
@@ -87,16 +88,38 @@ const configSlice=createSlice({
             state.deletedElements=[...state.deletedElements,action.payload]
         },
         pushQr:(state,action) => {
-            state.qrCodes=[...state.qrCodes,action.payload]
+            if(!action.payload) return;
+            if(!('length' in action.payload))
+            state.qrCodes.push(action.payload)
+            else state.qrCodes=action.payload
         },
-        pushBr:(state,action) => {
-            state.barcodes=[...state.barcodes,action.payload]
-        },
+        pushBr: (state, action) => {
+            if (!action.payload) return;
+            
+            if (!Array.isArray(action.payload)) {
+                state.barcodes = [action.payload];
+            } else {
+                state.barcodes = [...action.payload];
+            }
+        
+            console.log([...state.barcodes]);  // Clone and log to avoid proxy issues
+        }
+        ,
         pushTxt:(state,action) => {
-            state.texts=[...state.texts,action.payload]
+            if (!action.payload) return;
+            
+            if (!Array.isArray(action.payload)) {
+                state.texts = [action.payload];
+            } else {
+                state.texts = [...action.payload];
+            }
+        
+            console.log([...state.texts]);
         },
         pushImg:(state,action) => {
-            state.images=[...state.images,action.payload]
+            if(!action.payload) return;
+            
+            state.images=action.payload
         },
         setAttr:(state,action) => {
             state.attributes=action.payload

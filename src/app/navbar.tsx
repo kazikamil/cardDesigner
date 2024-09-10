@@ -139,8 +139,10 @@ export default function Navbar(){
     const download = ()=>{
         let xml=`<?xml version="1.0" encoding="utf-8"?>
         <ThermalLabel density="${density}" UnitType="Cm" Width="${lWidth}" Height="${lHeight}"> \n`
+        console.log(elements)
         for(let element of elements)
         {
+            console.log(element)
             if(element.cuQr)
             {
                 xml+=`<qrCode Symbology="QrCode" X="${element.dotsX}" Y="${element.dotsY}" Height="${element.dotsHeight}" Code="${element.cuQr}"/>\n`

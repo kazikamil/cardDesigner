@@ -21,9 +21,12 @@ const rvnSlice=createSlice({
          if(state.rectVers=='r')
             state.rectVers='v';
          else state.rectVers='r';
+        },
+        setNr:(state,action) => {
+            state.nr=action.payload
         }
     }
 })
-export const {inc}=rvnSlice.actions
+export const {inc,setNr}=rvnSlice.actions
 export const {changeS}=rvnSlice.actions
 export default rvnSlice.reducer

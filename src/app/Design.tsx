@@ -26,13 +26,14 @@ export default function Design()
    let [qrs,setQrs]=useState<any>([])
    let [brcs,setBrcs]=useState<any>([])
    let [txts,setTxts]=useState<any>([])
+   let [imgs,setImgs]=useState<any>([])
    let cla:string=useSelector((state:any)=>state.rotate.class)
    let deletedElements=useSelector((state:any)=>state.config.deletedElements)
    let [addedE,pushAddE]=useState<any>([])
    let qrCode=useSelector((state:any)=>state.config.qrCodes)
    let barcode=useSelector((state:any)=>state.config.barcodes)
    let text=useSelector((state:any)=>state.config.texts)
-   let image=useSelector((state:any)=>state.config.image)
+   let image=useSelector((state:any)=>state.config.images)
    let clas:string=`border border-solid border-black ${cla} absolute`
    let rv:string=useSelector((state:any)=>state.rvn.rectVers)
    let hidden:any=useSelector((state:any)=>state.api.hidden)
@@ -218,12 +219,34 @@ export default function Design()
         pushAddE(tab)
         console.log(txs)
         setTimeout(()=>{
-        dispatch(setNr(nr+barcode.length))
+        dispatch(setNr(nr+text.length))
         },2000)
         console.log(txs[0].index)
         let newTab=[...txts,...txs]
         setTxts(newTab)
      },[text])
+     useEffect(()=>{
+      if(!image) return;
+      if(!image.length) return;
+      console.log(image)
+      let ims:any=[];
+      let tab=addedE
+      for(let i=nr;i<image.length+nr;i++)
+        {
+          console.log({i})
+          tab.push(i)
+          console.log({tab}) 
+          ims.push({index:i,img:image[i-nr]})
+        }
+        pushAddE(tab)
+        console.log(ims)
+        setTimeout(()=>{
+        dispatch(setNr(nr+imgs.length))
+        },2000)
+        console.log(ims[0].index)
+        let newTab=[...imgs,...ims]
+        setImgs(newTab)
+     },[image])
      useEffect(()=>{
       console.log({attributes})
       let width=attributes.Width*950/(max*2)
@@ -277,7 +300,12 @@ export default function Design()
         }
         {
           txts.map((item:any, index:number) => (
-            !(deletedElements.includes(item.index))&&<Picture id={item.index} key={item.index} containerRef={containerRef} text={item.tx['@attributes'].text} x={item.tx['@attributes'].X} y={item.tx['@attributes'].Y}  />
+            !(deletedElements.includes(item.index))&&<Picture id={item.index} key={item.index} containerRef={containerRef}  text={item.txt['@attributes'].Text} font={item.txt['@attributes'].Font} x={item.txt['@attributes'].X} y={item.txt['@attributes'].Y} height={item.txt['@attributes'].Height}  />
+           ))
+        }
+        {
+          imgs.map((item:any, index:number) => (
+            !(deletedElements.includes(item.index))&&<Picture id={item.index} key={item.index} containerRef={containerRef}  x={item.img['@attributes'].X} y={item.img['@attributes'].Y} src={item.img['@attributes'].src}/>
            ))
         }
         </div>

@@ -145,19 +145,20 @@ export default function Navbar(){
             console.log(element)
             if(element.cuQr)
             {
-                xml+=`<qrCode Symbology="QrCode" X="${element.dotsX}" Y="${element.dotsY}" Height="${element.dotsHeight}" Code="${element.cuQr}"/>\n`
+                xml+=`<qrCode Symbology="QrCode" X="${element.cmX}" Y="${element.cmY}" Height="${element.cmHeight}" Code="${element.cuQr}"/>\n`
             }
             else if(element.valueC)
             {
-                xml+=`<barcodeItem Symbology="${element.bType}" X="${element.dotsX}" Y="${element.dotsY}" Height="${element.dotsHeight}" Width="${element.dotsWidth}" Code="${element.valueC}"/>\n`
+                xml+=`<barcodeItem Symbology="${element.bType}" X="${element.cmX}" Y="${element.cmY}" Height="${element.cmHeight}" Width="${element.cmWidth}" Code="${element.valueC}"/>\n`
             }
             else if (element.text)
             {
-                xml+=`<textItem X="${element.dotsX}" Y="${element.dotsY}" Height="${element.dotsHeight}" Width="${element.dotsWidth}"  Text="${element.text}" font=""/>\n`
+                xml+=`<textItem X="${element.cmX}" Y="${element.cmY}" Height="${element.cmHeight}" Width="${element.cmWidth}"  Text="${element.text}" Font="${element.fn}"/>\n`
             }
             else if (element.imgData)
             {
-                xml+=`<image X="${element.dotsX}" Y="${element.dotsY}"  data="${element.imgData}"/>\n`
+                xml+=`<image X="${element.cmX}" Y="${element.cmY}" src="${element.ImageSrc}"
+                data="${element.imgData}"/>\n`
             }
         }
         xml+='</ThermalLabel>'

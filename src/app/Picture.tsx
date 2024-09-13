@@ -5,7 +5,7 @@ import {Resizable} from "react-resizable"
 import 'react-resizable/css/styles.css'
 import { useDispatch, useSelector } from "react-redux";
 import { add, remove } from "./Store/features/align";
-import textSlice, { setTxt } from "./Store/features/textSlice";
+import textSlice, { setSize, setTxt } from "./Store/features/textSlice";
 import Barcode from "react-barcode";
 import QRCode from "react-qr-code";
 import { addE, pushDel, setRef } from "./Store/features/conifg";
@@ -24,6 +24,8 @@ type HeaderParam={
   height?:any,
   text?:any,
   size?:any,
+  src?:any,
+  font?:any,
 }
 export default function Picture(props:HeaderParam)
 {
@@ -40,7 +42,7 @@ export default function Picture(props:HeaderParam)
     let [dotsY,setDotsY]=useState(0)
     let [dotsHeight,setDotsHeight]=useState(0)
     let [dotsWidth,setDotsWidth]=useState(0)
-    let [fWeight,setWeight]=useState('100')
+    let [fWeight,setWeight]=useState('300')
     let weight=useSelector((state:any)=>state.text.weight) 
     let bType=useSelector((state:any)=>state.api.bType) 
     let [type,setType]=useState<any>('CODE128')
@@ -73,6 +75,10 @@ export default function Picture(props:HeaderParam)
     let [text,setText]=useState('') 
     let [cWidth,setCWidth]=useState(0)
     let [cHeight,setCHeight]=useState(0)
+    let [cmHeight,setCmHeight]=useState(0)
+    let [cmWidth,setCmWidth]=useState(0)
+    let [cmY,setCmY]=useState(0)
+    let [cmX,setCmX]=useState(0)
     let [cY,setCY]=useState(0)
     let [cX,setCX]=useState(0)
     if (tool=="resize"&&Clicked)
@@ -486,6 +492,12 @@ export default function Picture(props:HeaderParam)
       console.log({textY,cmY})
       console.log({cmHeight,cmWidth})
       console.log({cX,cY,cmX,cmY,d})
+      setCmHeight(cmHeight)
+      setCmWidth(cmWidth)
+      setCmX(cmX)
+      setCmY(cmY)
+
+      
     },[cY,cHeight,cWidth,cX,density,max])
     useEffect(()=>{
       if(cuQr)
@@ -524,14 +536,16 @@ export default function Picture(props:HeaderParam)
       }
     },[cHeight,cWidth])
     useEffect(()=>{
-      dispatch(addE({id:props.id,dotsX,dotsWidth,dotsY,dotsHeight,text,imgData,valueC,cuQr,bType:valueC?bType:null}))
-    },[dotsX,dotsWidth,dotsHeight,dotsY,valueC,cuQr,text,imgData,bType])
+      dispatch(addE({id:props.id,cmX,cmWidth,fn,ImageSrc,cmY,cmHeight,text,imgData,valueC,cuQr,type:valueC?bType:null}))
+    },[cmX,cmWidth,cmHeight,cmY,valueC,cuQr,text,imgData,bType,ImageSrc,fn])
     function handleInput(event:any)
     {
       setText(event.target.innerText)
       dispatch(setTxt(event.target.innerText))
     }
-    
+    useEffect(()=>{
+      if(Clicked) setFont(font)
+    },[font])
     const handleDragStart = (event:any) => {
       console.log({index})
       event.dataTransfer.setData("text/plain", parseInt(event.target.id));
@@ -551,9 +565,9 @@ export default function Picture(props:HeaderParam)
         if(props.cuQr)
         {
           let Ele:any=ref.current
-          let cmheight=props.height/60
-          let cmX=props.x/60
-          let cmY=props.y/60
+          let cmheight=props.height
+          let cmX=props.x
+          let cmY=props.y
           let px=cmX*1000/(max*2)
           let py=cmY*1000/(max*2)
           let pHeight=cmheight*1000/(max*2)
@@ -571,10 +585,10 @@ export default function Picture(props:HeaderParam)
         if(props.valueC)
         {
           let Ele:any=ref.current
-          let cmheight=props.height/60
-          let cmWidth=props.width/60
-          let cmX=props.x/60
-          let cmY=props.y/60
+          let cmheight=props.height
+          let cmWidth=props.width
+          let cmX=props.x
+          let cmY=props.y
           let px=cmX*1000/(max*2)
           let py=cmY*1000/(max*2)
           let pHeight=cmheight*1000/(max*2)
@@ -594,13 +608,17 @@ export default function Picture(props:HeaderParam)
         }
         if(props.text)
         {
+          setBco({r:255,g:0,b:0,a:0})
+
           let Ele:any=ref.current
-          let cmWidth=props.width/60
-          let cmX=props.x/60
-          let cmY=props.y/60
+          let cmheight=props.height
+          let cmWidth=props.width
+          let cmX=props.x
+          let cmY=props.y
           let px=cmX*1000/(max*2)
           let py=cmY*1000/(max*2)
           let pWidth=cmWidth*1000/(max*2)
+          let pHeight=cmheight*1000/(max*2)
           Ele.style.top=py+'px'
           Ele.style.left=px+'px'
           Ele.style.width=pWidth+'px'
@@ -608,10 +626,33 @@ export default function Picture(props:HeaderParam)
           setCWidth(pWidth)
           setCX(px)
           setCY(py)
+          setS(pHeight)
+          setTimeout(()=>{
+            if(pRef.current)
+           { let p:any=pRef.current
+            p.innerText=props.text
+            let rect = p.getBoundingClientRect();
+            let pi :any= ref.current;
+            pi.style.height = rect.height+ "px";
+            pi.style.width = rect.width + "px";
+          }
+          },100)
           console.log(props.valueC)
-          setBco({r:255,g:0,b:0,a:0})
         }
-
+        if(props.src)
+        {
+          let Ele:any=ref.current
+          let cmX=props.x
+          let cmY=props.y
+          let px=cmX*1000/(max*2)
+          let py=cmY*1000/(max*2)
+          Ele.style.top=py+'px'
+          Ele.style.left=px+'px'
+          setBco({r:255,g:0,b:0,a:0})
+          SetSrc(props.src)
+          setCX(px)
+          setCY(py)
+        }
       },[])
       useEffect(()=>{
         if(Clicked) setType(bType)
@@ -626,7 +667,7 @@ export default function Picture(props:HeaderParam)
           }
           {
             text&&<div title="text" data-content={text} data-width={Math.round(dotsWidth)} data-x={Math.round(dotsX)} data-y={Math.round(dotsY)}>
-              <p  onInput={handleInput} data-font={font.replace(/ /g,"_")} contentEditable="true" ref={pRef} title="text"  /*height={(size*30/1000)*density*10}*/  style={{fontWeight:`${fWeight}`,fontSize:size+'px',fontFamily:font+',monospace',color:cl,whiteSpace:"nowrap", outline:'none'}}></p>
+              <p  onInput={handleInput} data-font={fn.replace(/ /g,"_")} contentEditable="true" ref={pRef} title="text"  /*height={(size*30/1000)*density*10}*/  style={{fontWeight:`${fWeight}`,fontSize:size+'px',fontFamily:fn+',monospace',color:cl,whiteSpace:"nowrap", outline:'none'}}></p>
             </div>
             
           } 

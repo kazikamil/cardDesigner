@@ -117,9 +117,15 @@ const configSlice=createSlice({
             console.log([...state.texts]);
         },
         pushImg:(state,action) => {
-            if(!action.payload) return;
+            if (!action.payload) return;
             
-            state.images=action.payload
+            if (!Array.isArray(action.payload)) {
+                state.images = [action.payload];
+            } else {
+                state.images = [...action.payload];
+            }
+        
+            console.log([...state.images]);
         },
         setAttr:(state,action) => {
             state.attributes=action.payload

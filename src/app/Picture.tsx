@@ -8,10 +8,19 @@ import { add, remove } from "./Store/features/align";
 import textSlice, { setSize, setTxt } from "./Store/features/textSlice";
 import Barcode from "react-barcode";
 import QRCode from "react-qr-code";
-import { addE, pushDel, setRef } from "./Store/features/conifg";
-
+import { addE, pushCopied, pushDel, setRef } from "./Store/features/conifg";
+import bwipjs from "bwip-js";
 import '@fontsource/cairo/500.css'
 import { setBType } from "./Store/features/api";
+type BarcodeType = 'CODE128' | 'CODE39' | 'EAN13' | 'EAN8' | 'DataMatrix' | 'codabar';
+const types = {
+  "CODE128":"^BCN,",
+  "CODE39":"^B3N,N,",
+  "EAN13":"^BEN,",
+  "EAN8":"^B8N,",
+  "DataMatrix":"^BXN",
+  "codabar":"^BKN,N,",
+}
 type HeaderParam={
   id:any,
   containerRef:any,
@@ -26,18 +35,21 @@ type HeaderParam={
   size?:any,
   src?:any,
   font?:any,
+  xml?:boolean,
 }
 export default function Picture(props:HeaderParam)
 {
     let pRef=useRef<any>(null)
+    let cRef=useRef<any>(null)
     let imgRef=useRef<any>(null)
     let bRef=useRef<any>(null)
     let [textY,setTextY]=useState(0)
     let Bcolor=useSelector((state:any)=>state.sizePos.backC)
     let density=useSelector((state:any)=>state.config.density)
+    let displayValue=useSelector((state:any)=>state.api.displayValue)
     let [imgData,setImgData]=useState('')
     let [thikness,setThikness]=useState(0)
-    let [Bco,setBco]=useState({r:255,g:0,b:0,a:1})
+    let [Bco,setBco]=useState({r:255,g:0,b:0,a:0})
     let [dotsX,setDotsX]=useState(0)
     let [dotsY,setDotsY]=useState(0)
     let [dotsHeight,setDotsHeight]=useState(0)
@@ -45,7 +57,7 @@ export default function Picture(props:HeaderParam)
     let [fWeight,setWeight]=useState('300')
     let weight=useSelector((state:any)=>state.text.weight) 
     let bType=useSelector((state:any)=>state.api.bType) 
-    let [type,setType]=useState<any>('CODE128')
+    let [type,setType]=useState<BarcodeType>('CODE128')
     let thick=useSelector((state:any)=>state.sizePos.thick) 
     let color=useSelector((state:any)=>state.text.color) 
     let height=useSelector((state:any)=>state.config.height)
@@ -65,6 +77,7 @@ export default function Picture(props:HeaderParam)
     let [index,setInd]=useState(0)
     let dispatch=useDispatch()
     let [Clicked,setClicked]=useState(false)
+    let [dp,setDp]=useState(false)
     let deletedElements=useSelector((state:any)=>state.config.deletedElements)
     let val=useSelector((state:any)=>state.sizePos.val)
     let opt=useSelector((state:any)=>state.sizePos.option)
@@ -102,14 +115,16 @@ export default function Picture(props:HeaderParam)
     startX: number,
     startY: number,
     lastX: number,
-    lastY: number
+    lastY: number,
+    copy: () => void
   }>({
     startX: 0,
     startY: 0,
     lastX: 0,
-    lastY: 0
+    lastY: 0,
+    copy:copy
   })
-  
+  const clicked=useRef<boolean>(false);
     useEffect(() => {
       console.log(tool+"hi")
       if(tool=='select') return;
@@ -227,6 +242,27 @@ export default function Picture(props:HeaderParam)
         resizerLeft.removeEventListener("mousedown", onMouseDownLeftResize);
       };
     }, [tool]);
+    useEffect(() => {
+      const handleKeydown = (event:any) => {
+        console.log(clicked.current);
+        if (event.ctrlKey && event.key === 'c' && clicked.current) {
+          event.preventDefault();  // Empêche la copie par défaut
+          console.log('Ctrl + C a été intercepté, mais pas copié');
+          dispatch(pushCopied({ cX, cHeight, cWidth, cY, ImageSrc, valueC, text, type, weight, size, cuQr }));
+        }
+      };
+    
+      document.addEventListener('keydown', handleKeydown);
+    
+      return () => {
+        document.removeEventListener('keydown', handleKeydown); // Nettoyer l'événement
+      };
+    }, [cX, cHeight, cWidth, cY, ImageSrc, valueC, text, type, weight, size, cuQr]);  // Ajoute 'clicked' comme dépendance si nécessaire
+    
+    function copy() {
+      
+    }
+    
     useEffect(()=>{
       if(Clicked&&tool=='select'&&ref.current)
       {
@@ -268,7 +304,7 @@ export default function Picture(props:HeaderParam)
       if(Clicked) setBco(Bcolor)
     },[Bcolor])
     useEffect(() => {
-      if (!ref.current || !containerRef.current || tool==='resize') { console.log({tool:'no select'}); return;}
+      if (!ref.current || !containerRef.current || tool==='resize' || tool==='add') { console.log({tool:'no select'}); return;}
   
       const box :any = ref.current;
       const container = document.getElementById('ref')
@@ -363,6 +399,8 @@ export default function Picture(props:HeaderParam)
               let pi :any= ref.current;
               pi.style.height = rect.height+ "px";
               pi.style.width = rect.width + "px";
+              setCHeight(rect.height)
+              setCWidth(rect.width)
             }
           }
         }
@@ -400,13 +438,14 @@ export default function Picture(props:HeaderParam)
             setCuQr('');
             setText('');
             setImgData('');
+            SetSrc('')
             setBco({r:255,g:0,b:0,a:0})
         }
       }
     }, [value]);
     useEffect(()=>{
            
-           if(Clicked) {setCuQr(qr);setText('');setValue('');setImgData('');setBco({r:255,g:0,b:0,a:0})}
+           if(Clicked) {setCuQr(qr);SetSrc('');setText('');setValue('');setImgData('');setBco({r:255,g:0,b:0,a:0})}
         console.log(qr)
     },[qr])
     useEffect(()=>{
@@ -421,11 +460,13 @@ export default function Picture(props:HeaderParam)
       if(tool==='Supp'){ dispatch(pushDel(props.id));return; }
       if(Clicked){
           setClicked(false)
+          clicked.current=false
           if(ref.current)
           dispatch(remove(index))
         }
       else if(!Clicked){
          setClicked(true);
+         clicked.current=true
          if(ref.current)
          {dispatch(add(props.id))
          index=alignTable.length-1}
@@ -469,25 +510,27 @@ export default function Picture(props:HeaderParam)
       div.style.height=rect.height+"px";
       div.style.width=rect.width+"px";}
     },[ImageSrc])
-
+    useEffect(()=>{
+      if(Clicked) setDp(displayValue)
+    },[displayValue])
 
     useEffect(()=>{
       console.log({density})
       let d= parseFloat(density);
       let cmY
-      let cmX=cX*2*max/1000;
+      let cmX=cX*2*max/950;
       
-      setDotsX(cmX*10*d+45)
+      setDotsX(cmX*10*d)
       if(text)
       { let hTextH:any=size/80
 
-       cmY=cY*2*max/959+hTextH;
+       cmY=cY*2*max/958+hTextH;
       }
-      else cmY=cY*max*2/1000;
+      else cmY=cY*max*2/957;
       setDotsY(cmY*10*d)
-      let cmWidth=cWidth*max*2/1000
+      let cmWidth=cWidth*max*2/957
       setDotsWidth(cmWidth*10*d)
-      let cmHeight=cHeight*max*2/1000
+      let cmHeight=cHeight*max*2/957
       setDotsHeight(cmHeight*10*d)
       console.log({textY,cmY})
       console.log({cmHeight,cmWidth})
@@ -562,7 +605,7 @@ export default function Picture(props:HeaderParam)
       event.target.style.opacity ='1';
       };
       useEffect(()=>{
-        if(props.cuQr)
+        if(props.cuQr && props.xml)
         {
           let Ele:any=ref.current
           let cmheight=props.height
@@ -582,7 +625,7 @@ export default function Picture(props:HeaderParam)
           setCY(py)
           return;
         }
-        if(props.valueC)
+        if(props.valueC && props.xml)
         {
           let Ele:any=ref.current
           let cmheight=props.height
@@ -605,8 +648,9 @@ export default function Picture(props:HeaderParam)
           setCY(py)
           console.log(props.valueC)
           setBco({r:255,g:0,b:0,a:0})
+          return
         }
-        if(props.text)
+        if(props.text && props.xml)
         {
           setBco({r:255,g:0,b:0,a:0})
 
@@ -638,8 +682,9 @@ export default function Picture(props:HeaderParam)
           }
           },100)
           console.log(props.valueC)
+          return;
         }
-        if(props.src)
+        if(props.src && props.xml)
         {
           let Ele:any=ref.current
           let cmX=props.x
@@ -652,11 +697,50 @@ export default function Picture(props:HeaderParam)
           SetSrc(props.src)
           setCX(px)
           setCY(py)
+          return;
         }
+        if(props.x)
+        {
+          let Ele:any=ref.current
+          Ele.style.top=props.y
+          Ele.style.left=props.x
+          console.log({width:props.width,height:props.height})
+          Ele.style.width=props.width
+          Ele.style.height=props.height
+          console.log({width:Ele.style.width,height:Ele.style.height})
+          props.src?SetSrc(props.src):SetSrc('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pjxzdmcgdmlld0JveD0iMCAwIDMyIDMyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxkZWZzPjxzdHlsZT4uY2xzLTF7ZmlsbDpub25lO3N0cm9rZTojMDAwO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2Utd2lkdGg6MnB4O308L3N0eWxlPjwvZGVmcz48dGl0bGUvPjxnIGlkPSJwbHVzIj48bGluZSBjbGFzcz0iY2xzLTEiIHgxPSIxNiIgeDI9IjE2IiB5MT0iNyIgeTI9IjI1Ii8+PGxpbmUgY2xhc3M9ImNscy0xIiB4MT0iNyIgeDI9IjI1IiB5MT0iMTYiIHkyPSIxNiIvPjwvZz48L3N2Zz4=');
+          props.cuQr?setCuQr(props.cuQr):SetSrc("")
+          props.valueC?setValue(valueC):SetSrc("")
+          props.text?setText(props.text):SetSrc("")
+          return;
+        }
+        SetSrc('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pjxzdmcgdmlld0JveD0iMCAwIDMyIDMyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxkZWZzPjxzdHlsZT4uY2xzLTF7ZmlsbDpub25lO3N0cm9rZTojMDAwO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2Utd2lkdGg6MnB4O308L3N0eWxlPjwvZGVmcz48dGl0bGUvPjxnIGlkPSJwbHVzIj48bGluZSBjbGFzcz0iY2xzLTEiIHgxPSIxNiIgeDI9IjE2IiB5MT0iNyIgeTI9IjI1Ii8+PGxpbmUgY2xhc3M9ImNscy0xIiB4MT0iNyIgeDI9IjI1IiB5MT0iMTYiIHkyPSIxNiIvPjwvZz48L3N2Zz4=')
       },[])
       useEffect(()=>{
         if(Clicked) setType(bType)
       },[bType])
+      useEffect(() => {
+        if(!Clicked||type!='DataMatrix') return;
+        if(Clicked&&type!='DataMatrix'){
+          const canvas = cRef.current;
+          const context = canvas.getContext('2d');
+          context.clearRect(0, 0, canvas.width, canvas.height);
+        }
+        try {
+          // Génération du Data Matrix à l'aide de toCanvas()
+          bwipjs.toCanvas(cRef.current, {
+            bcid: 'datamatrix',   // Type de code-barres
+            text: valueC,           // Le contenu du Data Matrix
+            scale: 3,             // Échelle du code
+            includetext: false,   // Ne pas inclure le texte en dessous
+            paddingwidth: 0,     // Largeur du padding
+            paddingheight: 0,    // Hauteur du padding
+          });
+          SetSrc('')
+        } catch (error) {
+          console.error('Erreur lors de la génération du Data Matrix:', error);
+        }
+      }, [valueC,type]);
     return (
        //<div ref={containerRef} className="container">
         <div 
@@ -666,8 +750,8 @@ export default function Picture(props:HeaderParam)
             <input  id={`fileInput${props.id}`} type="file" style={{display:'none'}} onChange={handleFileChange} />
           }
           {
-            text&&<div title="text" data-content={text} data-width={Math.round(dotsWidth)} data-x={Math.round(dotsX)} data-y={Math.round(dotsY)}>
-              <p  onInput={handleInput} data-font={fn.replace(/ /g,"_")} contentEditable="true" ref={pRef} title="text"  /*height={(size*30/1000)*density*10}*/  style={{fontWeight:`${fWeight}`,fontSize:size+'px',fontFamily:fn+',monospace',color:cl,whiteSpace:"nowrap", outline:'none'}}></p>
+            text&&<div title="text" data-font={fn.replace(/ /g,"_")+`_${fWeight}`} data-content={text} data-width={Math.round(dotsWidth)} data-x={Math.round(dotsX)} data-y={Math.round(dotsY)} data-height={Math.round(dotsHeight)}>
+              <p  onInput={handleInput}  contentEditable="true" ref={pRef} title="text"  /*height={(size*30/1000)*density*10}*/  style={{fontWeight:`${fWeight}`,fontSize:size+'px',fontFamily:fn+',monospace',color:cl,whiteSpace:"nowrap", outline:'none'}}></p>
             </div>
             
           } 
@@ -684,14 +768,23 @@ export default function Picture(props:HeaderParam)
           
             
             {
-              valueC&&
-              <div  className="h-full w-full " data-format={type} ref={bRef} data-width={Math.round(dotsWidth/(valueC.length*11+33))} data-height={Math.round(dotsHeight)} data-x={Math.round(dotsX)} data-y={Math.round(dotsY)} data-content={valueC} title="barcode">
+              valueC&&type!='DataMatrix'&&
+              <div data-command={types[type]}  className="h-full w-full " data-format={type} ref={bRef} data-width={Math.round(dotsWidth/(valueC.length*11+33))} data-height={Math.round(dotsHeight)} data-x={Math.round(dotsX)} data-y={Math.round(dotsY)} data-content={valueC} title="barcode">
               {
                 !hidden&&
-            <Barcode format={type} width={Math.round(cWidth/(valueC.length*11+type==='EAN8'?45:type==='codabar'?70:67))}  height={cHeight-30}   margin={0}     value={valueC}
+            <Barcode displayValue={dp} format={type} width={Math.round(cWidth/(valueC.length*11+type==='EAN8'?45:type==='codabar'?70:67))}  height={cHeight-(dp?30:0)}   margin={0}     value={valueC}
             />
               }
+              
             </div>
+            }
+            {
+              valueC&&type==='DataMatrix'&&
+              <div className="h-full w-full " data-height={Math.round(dotsHeight)} data-x={Math.round(dotsX)} data-y={Math.round(dotsY)} data-content={valueC} title="dataMatrix">
+              {
+                <canvas className="h-full w-full" ref={cRef} />
+              }
+              </div>
             }
             {
               cuQr&&
@@ -733,9 +826,9 @@ export default function Picture(props:HeaderParam)
 -- ajouter dans le design la line et le rectangle (hr [border top(thikness)]) //fait
 -- ajouter les types de code barres et renover le xml et xslt //99% data matrix
 -- regler align ref // 99% check align bottom and click and don't align
--- uploader un xml 
--- add undo redo
--- regler l'affichage des barcodes //99% 
+-- uploader un xml // 90%
 -- grammaire xml 
 -- ajoute une div d'erreur
+-- add undo redo
+-- regler l'affichage des barcodes //99% 
 */

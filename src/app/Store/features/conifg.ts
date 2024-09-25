@@ -17,6 +17,7 @@ interface MonState {
     barcodes:any[],
     texts:any[],
     images:any[],
+    copiedElements:any[],
 }
 const initialState:MonState={
     density:'6',
@@ -27,6 +28,7 @@ const initialState:MonState={
     max:15,
     elements:[],
     deletedElements:[],
+    copiedElements:[],
     lWidth:0,
     lHeight:0,
     containerRef:null,
@@ -93,6 +95,17 @@ const configSlice=createSlice({
             state.qrCodes.push(action.payload)
             else state.qrCodes=action.payload
         },
+        pushCopied: (state, action) => {
+            console.log({ a: action.payload });
+            // Crée une copie de l'état précédent et ajoute le nouvel élément
+            state.copiedElements = [...state.copiedElements, action.payload];
+            console.log({ copiedElements: state.copiedElements });
+        },
+        emptyCopied: (state) => {
+            // Réinitialise copiedElements à un tableau vide
+            state.copiedElements = [];
+            console.log('copiedElements vidé');
+        },        
         pushBr: (state, action) => {
             if (!action.payload) return;
             
@@ -141,7 +154,7 @@ export const {setMax}=configSlice.actions
 export const {addE}=configSlice.actions
 export const {setLHeight}=configSlice.actions
 export const {setLWidth}=configSlice.actions
-export const {pushDel,pushBr,pushImg,pushQr,pushTxt,setAttr}=configSlice.actions
+export const {pushDel,pushBr,pushImg,pushQr,pushTxt,setAttr,emptyCopied,pushCopied}=configSlice.actions
 export const {setContainerRef}=configSlice.actions
 export const {setRef}=configSlice.actions
 export default configSlice.reducer

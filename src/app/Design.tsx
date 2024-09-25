@@ -6,9 +6,10 @@ import Change from "./Change";
 import { useDispatch, useSelector } from "react-redux";
 import Picture from "./Picture";
 import { useEffect } from "react";
-import { setContainerRef, setHeight, setLHeight, setLWidth, setWidth } from "./Store/features/conifg";
+import { emptyCopied, setContainerRef, setHeight, setLHeight, setLWidth, setWidth } from "./Store/features/conifg";
 import { Icon } from '@iconify/react';
 import { setNr } from "./Store/features/rvnSlice";
+import { it } from "node:test";
 export default function Design()
 {
 
@@ -19,10 +20,14 @@ export default function Design()
    let rangeRef3=useRef(null)
    let rangeRef4=useRef(null)
    let designRef=useRef(null)
+   let divRef=useRef(null)
    let [composantsR,setComp]=useState<any>([])
    let composantsV=[]
    let [values,setValues]=useState([5,50,5,50])
    let containerRef=useRef<HTMLDivElement>(null)
+   let [compasants,setComps]=useState<any>([])
+   let [cElem,setCElem]=useState<any>([])
+   let [xywh,setXywh]=useState<any>({})
    let [qrs,setQrs]=useState<any>([])
    let [brcs,setBrcs]=useState<any>([])
    let [txts,setTxts]=useState<any>([])
@@ -39,10 +44,12 @@ export default function Design()
    let hidden:any=useSelector((state:any)=>state.api.hidden)
    let lWidth:any=useSelector((state:any)=>state.config.lWidth)
    let lHeight:any=useSelector((state:any)=>state.config.lHeight)
+   let tool:any=useSelector((state:any)=>state.tool.tool)
    let nr=useSelector((state:any)=>state.rvn.nr)
    let nv=useSelector((state:any)=>state.rvn.nv)
    let attributes=useSelector((state:any)=>state.config.attributes)
    let max=useSelector((state:any)=>state.config.max)
+   let copiedElements=useSelector((state:any)=>state.config.copiedElements)
    let dispatch=useDispatch()
    let [turn,setTurn]=useState(0)
    function handleChangeRange(event:any,ref:any)
@@ -264,6 +271,156 @@ export default function Design()
      useEffect(()=>{
       console.log(qrs)
      },[qrs])
+     const coords = useRef<{
+      firstX: number,
+      firstY: number,
+      move:boolean
+    }>({
+      firstX: 0,
+      firstY: 0,
+      move:false
+    })
+    useEffect(()=>{
+
+      document.addEventListener('keydown', function(event) {
+        if (event.ctrlKey && event.key === 'd') {
+          event.preventDefault();  // Empêche la copie par défaut
+          console.log('Ctrl + v a été intercepté, mais pas copié');
+          dispatch(emptyCopied())
+        }
+      });
+    },[])
+    useEffect(() => {
+      const handleKeydown = (event:any) => {
+        if (event.ctrlKey && event.key === 'v' ) {
+          console.log(copiedElements)
+          if(!copiedElements.length) return; 
+          event.preventDefault(); // Empêche la copie par défaut
+          console.log('Ctrl + V a été intercepté, mais pas copié');
+          console.log(copiedElements);
+          let tab2=addedE
+          let tab = [];
+          for (let i = nr; i < copiedElements.length + nr; i++) {
+            tab2.push(i)
+            tab.push({ ...copiedElements[i - nr], i });
+          }
+          let elems = [...cElem, ...tab];
+          console.log(elems);
+          pushAddE(tab2)
+  
+          let length = copiedElements.length;
+          // Démarre un interval pour effectuer les dispatch
+          const intervalId = setTimeout(() => {
+            dispatch(setNr(nr + length));
+            dispatch(emptyCopied());
+          }, 1000);
+  
+          setCElem(elems);
+  
+          // Nettoyer l'intervalle après le dispatch
+          return () => clearInterval(intervalId);
+        }
+      };
+  
+      document.addEventListener('keydown', handleKeydown);
+  
+      // Nettoyer l'event listener lors du démontage du composant
+      return () => {
+        document.removeEventListener('keydown', handleKeydown);
+      };
+    }, [copiedElements,nr]); 
+    
+    useEffect(() => {
+      if(tool!='add') return;
+      const design: any = designRef.current;
+      const onMouseDown = (event: any) => {
+        let rect = design.getBoundingClientRect();
+        let offsetLeft = rect.left;
+        let offsetTop = rect.top;
+    
+        coords.current.firstX = event.clientX;
+        coords.current.firstY = event.clientY;
+    
+        let div: any = divRef.current;
+        div.style.width='0px'
+        div.style.height='0px'
+        console.log({ f: event.clientX, g: event.clientY });
+    
+        div.style.left = event.clientX - offsetLeft + 'px';
+        div.style.top = event.clientY - offsetTop + 'px';
+    
+        coords.current.move = true;
+      };
+    
+      const onMouseMove = (event: any) => {
+        console.log(coords.current.move)
+        if (!coords.current.move) return;
+    
+        let div: any = divRef.current;
+        let rect = design.getBoundingClientRect();
+        let offsetLeft = rect.left;
+        let offsetTop = rect.top;
+    
+        const X = event.clientX;
+        const Y = event.clientY;
+        if(X<coords.current.firstX)
+          div.style.left=X-offsetLeft+"px"
+        if(Y<coords.current.firstY)
+          div.style.top=Y-offsetTop+"px"
+        const width =
+          X > coords.current.firstX
+            ? X - coords.current.firstX
+            : coords.current.firstX - X;
+        const height =
+          Y > coords.current.firstY
+            ? Y - coords.current.firstY
+            : coords.current.firstY - Y;
+    
+        div.style.width = width + 'px';
+        div.style.height = height + 'px';
+      };
+    
+      const onMouseUp = () => {
+        coords.current.move = false;
+        let div: any = divRef.current;
+
+        let element={x:div.style.left,y:div.style.top,w:div.style.width,h:div.style.height,}
+        coords.current.firstX = 0;
+        coords.current.firstY = 0;
+        let rect = div.getBoundingClientRect();
+        
+        div.style.width='0px';
+        div.style.height='0px'
+        if(rect.width<30&&rect.height<30) return
+        setXywh(element)
+      };
+    
+      design.addEventListener('mousedown', onMouseDown);
+      design.addEventListener('mousemove', onMouseMove);
+      design.addEventListener('mouseup', onMouseUp);
+    
+      // Cleanup function to remove event listeners on unmount
+      return () => {
+        design.removeEventListener('mousedown', onMouseDown);
+        design.removeEventListener('mousemove', onMouseMove);
+        design.removeEventListener('mouseup', onMouseUp);
+      };
+    }, [tool]);    
+    useEffect(()=>{
+      if(!xywh.x) return
+      let obj={
+        ...xywh,
+        id:nr
+      }
+      console.log(obj)
+      let table=[...compasants,obj]
+      setComps(table)
+      table=[...addedE,nr]
+      pushAddE(table)
+      setInterval(()=>{
+        dispatch(setNr(nr+1))
+      },1000)
+    },[xywh])
    return(
    <div id="ref" ref={containerRef} className="overflow-y-scroll custom-scrollbar overflow-x-hidden h-full w-full flex p-20 justify-center h-screen relative">
         {<svg className=" fixed  top-20 left-[33px]" ref={svgRef} width={1000} height={1000}></svg>
@@ -290,23 +447,38 @@ export default function Design()
         }
         {
           qrs.map((item:any, index:number) => (
-            !(deletedElements.includes(item.index))&&<Picture id={item.index} key={item.index} containerRef={containerRef} cuQr={item.qr['@attributes'].Code} x={item.qr['@attributes'].X} y={item.qr['@attributes'].Y} height={item.qr['@attributes'].Height}/>
+            !(deletedElements.includes(item.index))&&<Picture id={item.index} key={item.index} containerRef={containerRef} cuQr={item.qr['@attributes'].Code} x={item.qr['@attributes'].X} y={item.qr['@attributes'].Y} height={item.qr['@attributes'].Height} xml={true}/>
            ))
         }
         {
           brcs.map((item:any, index:number) => (
-            !(deletedElements.includes(item.index))&&<Picture id={item.index} key={item.index} containerRef={containerRef} x={item.br['@attributes'].X} y={item.br['@attributes'].Y} height={item.br['@attributes'].Height} width={item.br['@attributes'].Width} type={item.br['@attributes'].Symbology} valueC={item.br['@attributes'].Code} />
+            !(deletedElements.includes(item.index))&&<Picture id={item.index} key={item.index} containerRef={containerRef} x={item.br['@attributes'].X} y={item.br['@attributes'].Y} height={item.br['@attributes'].Height} width={item.br['@attributes'].Width} type={item.br['@attributes'].Symbology} valueC={item.br['@attributes'].Code} xml={true} />
            ))
         }
         {
           txts.map((item:any, index:number) => (
-            !(deletedElements.includes(item.index))&&<Picture id={item.index} key={item.index} containerRef={containerRef}  text={item.txt['@attributes'].Text} font={item.txt['@attributes'].Font} x={item.txt['@attributes'].X} y={item.txt['@attributes'].Y} height={item.txt['@attributes'].Height}  />
+            !(deletedElements.includes(item.index))&&<Picture id={item.index} key={item.index} containerRef={containerRef}  text={item.txt['@attributes'].Text} font={item.txt['@attributes'].Font} x={item.txt['@attributes'].X} y={item.txt['@attributes'].Y} height={item.txt['@attributes'].Height} xml={true} />
            ))
         }
         {
           imgs.map((item:any, index:number) => (
-            !(deletedElements.includes(item.index))&&<Picture id={item.index} key={item.index} containerRef={containerRef}  x={item.img['@attributes'].X} y={item.img['@attributes'].Y} src={item.img['@attributes'].src}/>
+            !(deletedElements.includes(item.index))&&<Picture id={item.index} key={item.index} containerRef={containerRef}  x={item.img['@attributes'].X} y={item.img['@attributes'].Y} src={item.img['@attributes'].src} xml={true}/>
            ))
+        }
+        {
+          compasants.map((item:any, index:number) => (
+            !(deletedElements.includes(item.index))&&<Picture id={item.id} key={item.id} containerRef={containerRef} x={item.x} y={item.y} width={item.w} height={item.h} xml={false}/>
+           ))
+        }
+        {
+          cElem.map((item:any, index:number) => (
+            !(deletedElements.includes(item.i))&&<Picture id={item.i} key={item.i} containerRef={containerRef} x={item.cX-item.cWidth-5+"px"} y={item.cY-item.cHeight+"px"} width={item.cWidth+"px"} height={item.cHeight+"px"} xml={false} valueC={item.valueC} cuQr={item.cuQr} text={item.text} src={item.ImageSrc} />
+           ))
+        }
+        {
+          <div ref={divRef} className="absolute border border-blue-500 w-[0px]">
+
+          </div>
         }
         </div>
        

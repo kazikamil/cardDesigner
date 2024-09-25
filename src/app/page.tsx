@@ -25,8 +25,26 @@ import '@fontsource/cairo/600.css'
 import '@fontsource/cairo/700.css'
 import '@fontsource/cairo/800.css'
 import '@fontsource/cairo/900.css'
-export default function Home() {
+import { promises as fs } from 'fs';
+import path from 'path';
+
   
+export default function Home() {
+  const [fileData, setFileData] = useState('');
+
+  useEffect(() => {
+    // Fetch data from the API route
+    const fetchData = async () => {
+      try {
+        const response = await fetch('/api');
+        const result = await response.json();
+        setFileData(result.data);
+      } catch (error) {
+        console.error('Error fetching file data:', error);
+      }
+    };
+    fetchData();
+  }, []);
   
   return (
     <>
@@ -34,6 +52,7 @@ export default function Home() {
     <>
     <Navbar/>
     <div className='md:flex md:justify-between md:items-start'>
+    
       <SideBar/>
       <WorkSpace/>
       <Config/>

@@ -1,7 +1,7 @@
 "use client"
 import React, { useState } from "react"
 import { useDispatch, useSelector } from "react-redux";
-import { put, setBType } from "./Store/features/api";
+import { changeDisplay, put, setBType } from "./Store/features/api";
 export default function Btool(){
     let [type,Stype]=useState('C128')
     let bType=useSelector((state:any)=>state.api.bType) 
@@ -25,12 +25,17 @@ export default function Btool(){
               <option value={'EAN8'}>EAN-8</option>
               <option value={'pharmacode'}>pharmacode</option>
               <option value={'codabar'}>codabar</option>
+              <option value={'DataMatrix'}>Data Matrix</option>
             </select>
            <div className="inline-block relative w-30 "> 
             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
               <svg className="fill-current h-3 w-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
             </div>
            </div> 
+           <div className="space-x-3 flex items-center ml-10  w-50 m-1 mr-10">
+           <label htmlFor="checkbox">display value :</label>
+           <input onChange={(event)=>{dispatch(changeDisplay(event.target.checked))}} type="checkbox" id="checkbox" name="option" value="false" />
+           </div>
         </form>
     )
 }

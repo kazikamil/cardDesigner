@@ -3,7 +3,7 @@ import React, { useState } from "react"
 import Eurequat from "./img/Eurequat.png"
 import Image, { StaticImageData } from "next/image";
 import Btn from "./Btn";
-import select from "./img/Select.png"
+import add from "./img/Add.png"
 import AImg from "./img/AImg.png"
 import Brc from "./img/Brc.png"
 import Resize from "./img/Resize.png"
@@ -12,10 +12,7 @@ import ImageLib from "./img/ImgLib.png"
 import Qr from "./img/Qr.png"
 import Garbage from "./img/garbage.svg"
 import Line from './img/Line.png'
-type HeaderParam=
-{
-  func:(text:string)=>undefined;
-}
+import select from './img/Select.svg'
 type ImgC=
 {
   image:typeof Eurequat
@@ -24,6 +21,7 @@ type ImgC=
 }
 const images:ImgC[]=[
   {image:select,clicked:false,tool:"select"},
+  {image:add,clicked:false,tool:"add"},
   {image:Resize,clicked:false,tool:"resize"},
   {image:txt,clicked:false,tool:"txt"},
   {image:Qr,clicked:false,tool:"qr"},

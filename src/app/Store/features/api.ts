@@ -5,6 +5,7 @@ const initialState={
     qr:"",
     hidden:false,
     bType:"CODE128",
+    displayValue:false
 }
 const apiSlice=createSlice({
     name:"api",
@@ -24,9 +25,12 @@ const apiSlice=createSlice({
         },
         changeHidden: (state) => {
             state.hidden = !state.hidden; // Simplified toggle
-          }
+          },
+        changeDisplay: (state,action) => {
+            state.displayValue=action.payload
+        }  
     }
 })
-export const {put,setQr,changeHidden,setBType}=apiSlice.actions
+export const {put,setQr,changeHidden,setBType,changeDisplay}=apiSlice.actions
 
 export default apiSlice.reducer

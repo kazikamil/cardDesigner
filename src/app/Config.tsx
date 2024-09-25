@@ -96,10 +96,10 @@ export default function Config()
              <div className="font-bold">Densité d'impression</div>  
              <div> 
               <select onChange={(event)=>{dispatch(changeDensity(event.target.value))}} className="block appearance-none w-30  border-b border-slate-500 hover:border-gray-500 px-4 pr-8 text-xs  leading-tight focus:outline-none focus:shadow-outline m-1">
-               <option value={'6.33'}>6 dpmm (152 dpi)</option>
+               <option value={'6'}>6 dpmm (152 dpi)</option>
                <option value={'9'}>8 dpmm (203 dpi)</option>
                <option value={'12'}>12 dpmm (300 dpi)</option>
-               <option value={'24.33'}>24 dpmm (600 dpi)</option>
+               <option value={'24'}>24 dpmm (600 dpi)</option>
               </select>
               <div className="inline-block relative w-30 px-20 bottom-8 "> 
                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">

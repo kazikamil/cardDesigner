@@ -23,7 +23,6 @@ export default function Btool(){
               <option value={'CODE39'}>Code 39</option>
               <option value={'EAN13'}>EAN-13</option>
               <option value={'EAN8'}>EAN-8</option>
-              <option value={'pharmacode'}>pharmacode</option>
               <option value={'codabar'}>codabar</option>
               <option value={'DataMatrix'}>Data Matrix</option>
             </select>

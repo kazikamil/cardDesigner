@@ -125,7 +125,7 @@ export default function Config()
             <div className="flex flex-col items-center space-y-3">
              <div className="font-bold">Nombre de labels</div>   
              <div className="flex items-center border-b border-slate-500 w-20 ">
-             <input onChange={(event)=>{dispatch(changeNumber(event.target.value))}} className="appearance-none bg-transparent border-none w-full text-gray-700  leading-tight focus:outline-none" type="number" placeholder="0px" aria-label="Full name"/>
+             <input onChange={(event)=>{dispatch(changeNumber(event.target.value))}} className="appearance-none bg-transparent border-none w-full text-gray-700  leading-tight focus:outline-none" type="number" placeholder="0" aria-label="Full name"/>
            </div>
            </div>
           { <div className="flex flex-col items-center space-y-3">

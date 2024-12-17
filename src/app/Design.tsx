@@ -258,8 +258,8 @@ export default function Design()
       console.log({attributes})
       let width=attributes.Width*950/(max*2)
       let height=attributes.Height*970/(max*2)
-      let top=500-height/2
-      let left=518 -height/2
+      let top=495-height/2
+      let left=515-width/2
       let design:any=designRef.current
       console.log(design.offsetTop)
       design.style.top=top +'px' //(design.offsetTop+(top-design1.top))+'px'

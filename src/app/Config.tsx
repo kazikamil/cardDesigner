@@ -97,7 +97,7 @@ export default function Config()
              <div> 
               <select onChange={(event)=>{dispatch(changeDensity(event.target.value))}} className="block appearance-none w-30  border-b border-slate-500 hover:border-gray-500 px-4 pr-8 text-xs  leading-tight focus:outline-none focus:shadow-outline m-1">
                <option value={'6'}>6 dpmm (152 dpi)</option>
-               <option value={'9'}>8 dpmm (203 dpi)</option>
+               <option value={'8'}>8 dpmm (203 dpi)</option>
                <option value={'12'}>12 dpmm (300 dpi)</option>
                <option value={'24'}>24 dpmm (600 dpi)</option>
               </select>
@@ -137,7 +137,7 @@ export default function Config()
             }
             <div>
             <input  id={`fileInput`} type="file" style={{display:'none'}} onChange={handleFileChange} />
-           <button onClick={handleClick} className="bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-1 px-6 rounded-full">Upload Your Design</button>
+           <button onClick={handleClick} className="bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-6 rounded-full">Importer votre design</button>
            </div>
         </div>
     )

@@ -89,7 +89,7 @@ export default function Navbar(){
         console.log({hidden})
         zpl=await getZpl()
         console.log({zpl})
-        //writeToSelectedPrinter(zpl);
+        writeToSelectedPrinter(zpl);
         dispatch(changeHidden())
         },3000)
         //dispatch(changeHidden())
@@ -121,6 +121,8 @@ export default function Navbar(){
         win.BrowserPrint.getLocalDevices((devices:any) => {
             console.log({devices})
             setPrinters(devices.printer)
+            if(!devices || !devices.printer) return;
+            if(!('length' in devices.printer)) return;
             device= devices.printer[0];
             console.log(device)
             console.log(device.name)
@@ -217,15 +219,15 @@ export default function Navbar(){
                 </div>
 
                 
-                : <div>any device available</div>
+                : <div>Aucune imprimante disponible</div>
             }
             <Image src={Restart} alt="Restart" className="w-5 h-5" onClick={connect}/>
         </li>
         <li className="mx-4">
-            <button className="bg-blue-800 hover:bg-blue-900 text-white font-bold py-1 px-4 rounded-full" onClick={download}>Download</button>
+            <button className="bg-blue-800 hover:bg-blue-900 text-white font-bold py-1 px-4 rounded-full" onClick={download}>Télécharger</button>
         </li>
         <li className="mx-4">
-            <button className="bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-1 px-6 rounded-full" onClick={print}>Print</button>
+            <button className="bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-1 px-6 rounded-full" onClick={print}>Imprimer</button>
         </li>
        </ul>
       </nav>

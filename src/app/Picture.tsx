@@ -21,6 +21,27 @@ const types = {
   "DataMatrix":"^BXN",
   "codabar":"^BKN,N,",
 }
+const Zfont = {
+  "Arial, sans-serif":"^CFA,",
+  "'Courier New', monospace":"^CFB,",
+  "'Times New Roman', serif":"^CFD,",
+  "Helvetica, sans-serif":"^CFE,",
+  "Verdana, sans-serif":"^CFH,",
+  "Courier, monospace":"^CFG,",
+  "'Lucida Console', monospace":"^CFU,",
+  "Calibri, sans-serif":"^CFT,",
+}
+type FontKey = keyof typeof Zfont;
+const zplFonts = {
+  A: "Arial, sans-serif",
+  B: "'Courier New', monospace",
+  C: "'Times New Roman', serif",
+  D: "Helvetica, sans-serif",
+  E: "Verdana, sans-serif",
+  F: "Courier, monospace",
+  G: "'Lucida Console', monospace",
+  H: "Calibri, sans-serif"
+};
 type HeaderParam={
   id:any,
   containerRef:any,
@@ -69,7 +90,7 @@ export default function Picture(props:HeaderParam)
     let qr=useSelector((state:any)=>state.api.qr)
     let [cuQr,setCuQr]=useState('')
     let font=useSelector((state:any)=>state.text.font)
-    let [fn,setFont]=useState('')
+    let [fn,setFont]=useState<FontKey>('Arial, sans-serif')
     let px=useSelector((state:any)=>state.text.size)
     let [size,setS]=useState(20)
     let [ImageSrc,SetSrc]=useState<string|ArrayBuffer|null>('')
@@ -94,6 +115,9 @@ export default function Picture(props:HeaderParam)
     let [cmX,setCmX]=useState(0)
     let [cY,setCY]=useState(0)
     let [cX,setCX]=useState(0)
+    const getFontCode = (fn: FontKey): string => {
+      return Zfont[fn]; // TypeScript sait maintenant que `fn` est une clé valide
+    };
     if (tool=="resize"&&Clicked)
        {style="outline outline-[2px] outline-dashed outline-black"
        }
@@ -750,19 +774,19 @@ export default function Picture(props:HeaderParam)
             <input  id={`fileInput${props.id}`} type="file" style={{display:'none'}} onChange={handleFileChange} />
           }
           {
-            text&&<div title="text" data-font={fn.replace(/ /g,"_")+`_${fWeight}`} data-content={text} data-width={Math.round(dotsWidth)} data-x={Math.round(dotsX)} data-y={Math.round(dotsY)} data-height={Math.round(dotsHeight)}>
-              <p  onInput={handleInput}  contentEditable="true" ref={pRef} title="text"  /*height={(size*30/1000)*density*10}*/  style={{fontWeight:`${fWeight}`,fontSize:size+'px',fontFamily:fn+',monospace',color:cl,whiteSpace:"nowrap", outline:'none'}}></p>
+            text&&<div title="text" data-font={getFontCode(fn)} data-content={text} data-width={Math.round(dotsWidth/text.length)} data-x={Math.round(dotsX)} data-y={Math.round(dotsY)} data-height={Math.round(dotsHeight)}>
+              <p  onInput={handleInput} className={hidden?'hidden':''} contentEditable="true" ref={pRef} title="text"  /*height={(size*30/1000)*density*10}*/  style={{fontSize:size+'px',fontFamily:fn,color:cl,whiteSpace:"nowrap", outline:'none'}}></p>
             </div>
             
           } 
           {
-             thikness!=0&&
+             !hidden&&thikness!=0&&
              (<hr className="w-full" style={{ borderTop: `${thikness}px solid #000` }}></hr>)
             }
           {
             ImageSrc&&
             (<div style={{width:'100%',height:'100%',}} title="img" data-content={imgData} data-x={dotsX} data-y={dotsY}>
-              {!hidden &&<img style={{width:'100%',height:'100%',objectFit:'inherit'}} className="border border-blue-400"  ref={imgRef} src={ImageSrc?(typeof ImageSrc==='string'?ImageSrc:''):''} data-content={imgData}  />}
+              {!hidden &&<img style={{width:'100%',height:'100%',objectFit:'inherit'}} ref={imgRef} src={ImageSrc?(typeof ImageSrc==='string'?ImageSrc:''):''} data-content={imgData}  />}
             </div>)
           }
           
@@ -779,7 +803,7 @@ export default function Picture(props:HeaderParam)
             </div>
             }
             {
-              valueC&&type==='DataMatrix'&&
+              !hidden&&valueC&&type==='DataMatrix'&&
               <div className="h-full w-full " data-height={Math.round(dotsHeight)} data-x={Math.round(dotsX)} data-y={Math.round(dotsY)} data-content={valueC} title="dataMatrix">
               {
                 <canvas className="h-full w-full" ref={cRef} />
@@ -831,4 +855,11 @@ export default function Picture(props:HeaderParam)
 -- ajoute une div d'erreur
 -- add undo redo
 -- regler l'affichage des barcodes //99% 
+*/
+/*
+ZEBRA 0 -> Oswald Bold
+ZEBRA A -> Roboto Mono Normal 
+ZEBRA B -> Noto Sans Mono Black
+ZEBRA C -> Roboto Mono medium weight less than A
+ZEBRA E -> IBM Plex Mono
 */

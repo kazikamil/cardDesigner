@@ -29,7 +29,16 @@ const fonts: FontData = {
     ['900', 'Black'],
   ],
 };
-
+const zplFonts = {
+  A: "Arial, sans-serif",
+  B: "'Courier New', monospace",
+  C: "'Times New Roman', serif",
+  D: "Helvetica, sans-serif",
+  E: "Verdana, sans-serif",
+  F: "Courier, monospace",
+  G: "'Lucida Console', monospace",
+  H: "Calibri, sans-serif"
+};
 const Ttool: React.FC = () => {
   const color = useSelector((state: any) => state.text.color);
   const text = useSelector((state: any) => state.text.text);
@@ -100,8 +109,14 @@ const Ttool: React.FC = () => {
         onChange={handleF}
         className="block appearance-none w-30 border-b border-slate-500 hover:border-gray-500 px-4 pr-8 leading-tight focus:outline-none focus:shadow-outline m-1"
       >
-        <option value="Roboto Mono">Roboto Mono</option>
-        <option value="Cairo">Cairo</option>
+        <option value="Arial, sans-serif">Zebra A</option>
+        <option value="'Courier New', monospace">Zebra B</option>
+        <option value="'Times New Roman', serif">Zebra C</option>
+        <option value="Helvetica, sans-serif">Zebra D</option>
+        <option value="Verdana, sans-serif">Zebra E</option>
+        <option value="Courier, monospace">Zebra F</option>
+        <option value="'Lucida Console', monospace">Zebra G</option>
+        <option value="Calibri, sans-serif">Zebra H</option>
       </select>
       <div className="inline-block relative w-30">
         <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
@@ -110,7 +125,7 @@ const Ttool: React.FC = () => {
           </svg>
         </div>
       </div>
-      <select
+      {/*<select
         onChange={handleW}
         className="block ml-10 appearance-none w-30 border-b border-slate-500 hover:border-gray-500 px-4 pr-8 leading-tight focus:outline-none focus:shadow-outline m-1"
       >
@@ -119,7 +134,7 @@ const Ttool: React.FC = () => {
             {label}
           </option>
         ))}
-      </select>
+      </select>*/}
       <div className="inline-block relative w-30">
         <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
           <svg className="fill-current h-3 w-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">

@@ -109,14 +109,11 @@ const Ttool: React.FC = () => {
         onChange={handleF}
         className="block appearance-none w-30 border-b border-slate-500 hover:border-gray-500 px-4 pr-8 leading-tight focus:outline-none focus:shadow-outline m-1"
       >
-        <option value="Arial, sans-serif">Zebra A</option>
-        <option value="'Courier New', monospace">Zebra B</option>
-        <option value="'Times New Roman', serif">Zebra C</option>
-        <option value="Helvetica, sans-serif">Zebra D</option>
-        <option value="Verdana, sans-serif">Zebra E</option>
-        <option value="Courier, monospace">Zebra F</option>
-        <option value="'Lucida Console', monospace">Zebra G</option>
-        <option value="Calibri, sans-serif">Zebra H</option>
+        <option value="Zebra 0">Zebra 0</option>
+        <option value="Zebra A">Zebra A</option>
+        <option value="Zebra B">Zebra B</option>
+        <option value="Zebra C">Zebra C</option>
+        <option value="Zebra E">Zebra E</option>
       </select>
       <div className="inline-block relative w-30">
         <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">

@@ -22,25 +22,27 @@ const types = {
   "codabar":"^BKN,N,",
 }
 const Zfont = {
-  "Arial, sans-serif":"^CFA,",
-  "'Courier New', monospace":"^CFB,",
-  "'Times New Roman', serif":"^CFD,",
-  "Helvetica, sans-serif":"^CFE,",
-  "Verdana, sans-serif":"^CFH,",
-  "Courier, monospace":"^CFG,",
-  "'Lucida Console', monospace":"^CFU,",
-  "Calibri, sans-serif":"^CFT,",
+  "Zebra A":"^CFA,",
+  "Zebra B":"^CFB,",
+  "Zebra C":"^CFC,",
+  "Zebra E":"^CFE,",
 }
 type FontKey = keyof typeof Zfont;
+/*
+ZEBRA 0 -> Oswald Bold
+ZEBRA A -> Roboto Mono Normal 
+ZEBRA B -> Noto Sans Mono Black
+ZEBRA C -> Roboto Mono medium weight less than A
+ZEBRA E -> IBM Plex Mono
+*/
+import 'typeface-oswald'
+import 'typeface-ibm-plex-mono'
 const zplFonts = {
-  A: "Arial, sans-serif",
-  B: "'Courier New', monospace",
-  C: "'Times New Roman', serif",
-  D: "Helvetica, sans-serif",
-  E: "Verdana, sans-serif",
-  F: "Courier, monospace",
-  G: "'Lucida Console', monospace",
-  H: "Calibri, sans-serif"
+  "Zebra 0":{font:"'Oswald', sans-serif",weight:700},
+  "Zebra A":{font:"'Roboto Mono', monospace",weight:500},
+  "Zebra B":{font:"'Noto Sans Mono', monospace",weight:800},
+  "Zebra C":{font:"'Roboto Mono', monospace",weight:400},
+  "Zebra E":{font:"'IBM Plex Mono', monospace",weight:500},
 };
 type HeaderParam={
   id:any,
@@ -90,7 +92,7 @@ export default function Picture(props:HeaderParam)
     let qr=useSelector((state:any)=>state.api.qr)
     let [cuQr,setCuQr]=useState('')
     let font=useSelector((state:any)=>state.text.font)
-    let [fn,setFont]=useState<FontKey>('Arial, sans-serif')
+    let [fn,setFont]=useState<FontKey>('Zebra A')
     let px=useSelector((state:any)=>state.text.size)
     let [size,setS]=useState(20)
     let [ImageSrc,SetSrc]=useState<string|ArrayBuffer|null>('')
@@ -134,7 +136,9 @@ export default function Picture(props:HeaderParam)
     const refBottom = useRef<any>(null);
     const containerRef =props.containerRef
   const isClicked = useRef<boolean>(false);
-
+  useEffect(()=>{
+    console.log(zplFonts[fn])
+  },[fn])
   const coords = useRef<{
     startX: number,
     startY: number,
@@ -775,7 +779,7 @@ export default function Picture(props:HeaderParam)
           }
           {
             text&&<div title="text" data-font={getFontCode(fn)} data-content={text} data-width={Math.round(dotsWidth/text.length)} data-x={Math.round(dotsX)} data-y={Math.round(dotsY)} data-height={Math.round(dotsHeight)}>
-              <p  onInput={handleInput} className={hidden?'hidden':''} contentEditable="true" ref={pRef} title="text"  /*height={(size*30/1000)*density*10}*/  style={{fontSize:size+'px',fontFamily:fn,color:cl,whiteSpace:"nowrap", outline:'none'}}></p>
+              <p  onInput={handleInput} className={hidden?'hidden':''} contentEditable="true" ref={pRef} title="text"  /*height={(size*30/1000)*density*10}*/  style={{fontSize:size+'px',fontFamily:zplFonts[fn].font,fontWeight:zplFonts[fn].weight,color:cl,whiteSpace:"nowrap", outline:'none'}}></p>
             </div>
             
           } 
@@ -855,11 +859,4 @@ export default function Picture(props:HeaderParam)
 -- ajoute une div d'erreur
 -- add undo redo
 -- regler l'affichage des barcodes //99% 
-*/
-/*
-ZEBRA 0 -> Oswald Bold
-ZEBRA A -> Roboto Mono Normal 
-ZEBRA B -> Noto Sans Mono Black
-ZEBRA C -> Roboto Mono medium weight less than A
-ZEBRA E -> IBM Plex Mono
 */

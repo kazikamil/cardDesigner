@@ -103,7 +103,7 @@ export default function Navbar(){
     }
     useEffect(()=>{
         const script = document.createElement('script');
-    script.src = 'http://localhost:3000/BrowserPrint-3.1.250.min.js';
+    script.src = '/BrowserPrint-3.0.216.min.js';
     script.onload = () => {
       // Initialisation du SDK Zebra Browser Print
       console.log('Zebra Browser Print SDK Loaded');

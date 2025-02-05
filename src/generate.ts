@@ -1,4 +1,4 @@
-const jwt = require("jsonwebtoken");
+/*const jwt = require("jsonwebtoken");
 
 const secret = "3bp9Q8S3aTriQ4"; // ⚠️ 
 
@@ -9,3 +9,4 @@ const token = jwt.sign(
 );
 
 console.log("🔑 Ton token JWT :", token);
+*/

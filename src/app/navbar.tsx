@@ -106,7 +106,7 @@ export default function Navbar(){
     }
     useEffect(()=>{
         const script = document.createElement('script');
-    script.src = '/BrowserPrint-3.0.216.min.js';
+    script.src = '/impression_etiquette_en_ligne/BrowserPrint-3.0.216.min.js';
     script.onload = () => {
       // Initialisation du SDK Zebra Browser Print
       console.log('Zebra Browser Print SDK Loaded');

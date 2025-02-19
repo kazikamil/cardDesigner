@@ -13,15 +13,13 @@
     "@fontsource/cairo": "^5.0.21",
     "@fontsource/roboto-mono": "^5.0.19",
     "@reduxjs/toolkit": "^2.2.6",
-    "@wordpress/scripts": "^28.6.0",
     "bwip-js": "^4.5.1",
     "cross-env": "^7.0.3",
     "d3": "^7.9.0",
     "fs": "^0.0.1-security",
-    "html-to-image": "^1.11.11",
     "jose": "^5.9.6",
     "jsonwebtoken": "^9.0.2",
-    "next": "14.2.4",
+    "next": "^15.1.7",
     "path": "^0.12.7",
     "react": "^18",
     "react-barcode": "^1.5.3",
@@ -31,9 +29,7 @@
     "react-redux": "^9.1.2",
     "react-resizable": "^3.0.5",
     "typeface-ibm-plex-mono": "^1.1.13",
-    "typeface-oswald": "^1.1.13",
-    "xsl": "^0.0.2",
-    "xslt-processor": "^3.0.1"
+    "typeface-oswald": "^1.1.13"
   },
   "devDependencies": {
     "@iconify/react": "^5.0.2",

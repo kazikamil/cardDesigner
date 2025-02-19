@@ -3,8 +3,6 @@ import React, { useEffect, useState } from "react"
 import Eurequat from "./img/Eurequat.png"
 import Restart from "./img/rotate.png"
 import Image from "next/image";
-import { Xslt, XmlParser } from 'xslt-processor'
-import { toPng } from "html-to-image";
 import { useDispatch, UseDispatch, useSelector } from "react-redux";
 import { changeHidden } from "./Store/features/api";
 var htmlString:any;
@@ -45,32 +43,7 @@ export default function Navbar(){
 }
         
     }
-    const convertHtmlToPng = async (element:any) => {
-        try {
-          console.log("hi")
-          console.log({element})
-          element.style.height = '500px'; // or any other fixed height for testing
-
-          console.log('Element dimensions:', element.offsetWidth, element.offsetHeight);
-          console.log('Element visibility:', getComputedStyle(element).display);
-          const dataUrl = await toPng(element);
-          console.log("hello")
-          console.log(dataUrl)
-          const response = await fetch(dataUrl);
-          const blob = await response.blob();
-          return blob;
-        } catch (error) {
-          console.error('Erreur lors de la conversion HTML en PNG :', error);
-          throw error;
-        }
-      };
-    const getBlob = async () => {
-        let element=document.getElementById('recto')
-        console.log("elem")
-        let blob=await convertHtmlToPng(element)
-        console.log(blob)
-        return blob;
-    }
+   
     function writeToSelectedPrinter(dataToWrite:any ) {
         console.log("Printing...")
         console.log(device)
